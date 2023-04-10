@@ -3,5 +3,4 @@ A web application that allows users to add items/products using a url of a shopp
 
 
 ## Parts
-#
 * Python script to scrape websites based on url
