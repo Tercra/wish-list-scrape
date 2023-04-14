@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup, SoupStrainer
+import base64
 import requests
 import re
 
@@ -21,9 +22,33 @@ def extractOrigin(url):     #Can return None if no match
 
     return m.group(3)
 
+#Scraping info from otaku republic and sister sites
+def otakuRepublicScrape(html):
+    metaTags = SoupStrainer("meta")
+    soup = BeautifulSoup(html, "html.parser", parse_only=metaTags)
+    if(soup.find("meta", property="og:type")["content"] != "product"):
+        return {"success" : False}
+
+    # Scraping info from the meta tags
+    res = {}
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    res["name"] = soup.find("meta", property="og:title")["content"]
+    res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
+    if(soup.find("meta", property="og:availability")["content"] == "instock"):
+        res["inStock"] = True
+    else:
+        res["inStock"] = False
+    
+    #requestImage
+    imgURL = soup.find("meta", property="og:image")["content"].removesuffix(".l_thumbnail.webp")
+    # img = base64.b64encode(requestURL(imgURL)["req"].content)
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 
 if __name__ == "__main__":
-    print(requestURL("https://otakurepublic.com/product/product_page_5741091.html"))
+    req = requestURL("https://otakurepublic.com/product/product_page_5741091.html")["req"]
     print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
-
-    print(requestURL("https://ww.cdjapan.co.jp/"))
+    print(otakuRepublicScrape(req.text))
