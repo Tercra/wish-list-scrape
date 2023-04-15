@@ -12,7 +12,7 @@ def requestURL(url):
     else:
         return {"success" : True, "req":req}
 
-    return {"success" : False, "req":None}
+    return {"success" : False}
 
 def extractOrigin(url):     #Can return None if no match
     m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp)", url)
@@ -48,7 +48,34 @@ def otakuRepublicScrape(html):
     return {"success" : True, "res" : res}
 
 
+ORIGINS = {
+    "otakurepublic" : otakuRepublicScrape,
+    "goodsrepublic" : otakuRepublicScrape,
+    "japanese-snacks-republic" : otakuRepublicScrape
+}
+
+def scrapeInfo(url):
+    #Check if url is valid and if origin is part of configured sites
+    origin = extractOrigin(url)
+    if(origin == "N/A" or origin not in ORIGINS.keys()):
+        return {"success" : False}
+
+    reqResponse = requestURL(url)
+
+    if(not reqResponse["success"]):
+        return {"success" : False}
+
+    info = ORIGINS[origin](reqResponse["req"].text)
+
+    if(info["success"]):
+        return {"success" : True, "res" : info["res"]}
+    
+    return {"success" : False}
+    
+
+
 if __name__ == "__main__":
-    req = requestURL("https://otakurepublic.com/product/product_page_5741091.html")["req"]
-    print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
-    print(otakuRepublicScrape(req.text))
+    # req = requestURL("https://otakurepublic.com/product/product_page_5741091.html")["req"]
+    # print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
+    # print(otakuRepublicScrape(req.text))
+    print(scrapeInfo("https://otakurepublic.com/product/product_page_5741091.html"))
