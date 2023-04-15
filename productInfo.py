@@ -58,7 +58,7 @@ def cdJapanScrape(html):
     if(res["url"].find("cdjapan.co.jp/product/") < 0):
         return {"success" : False}
 
-    res["name"] = soup.find("meta", property="og:title")["content"]
+    res["name"] = soup.find("meta", property="og:title")["content"].strip()
     res["price"] = float(soup.find("span", itemprop="price")["content"])
     res["currency"] = "JPY"
     if(soup.find("a", href="https://www.cdjapan.co.jp/guide/help/shipping/when_will_my_order_ship").get_text().strip() == "Sold Out"):

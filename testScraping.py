@@ -46,7 +46,7 @@ class TestScrapingMethods(unittest.TestCase):
     def test_cdJapanScrape(self):
         #Working product page
         res = productInfo.cdJapanScrape(productInfo.requestURL("https://www.cdjapan.co.jp/product/TFXQ-78234")["req"].text)["res"]
-        self.assertEqual(res["name"], "Midnight Grand Orchestra 1st Live \"Overture\"  Midnight Grand Orchestra Blu-ray\n\n")
+        self.assertEqual(res["name"], "Midnight Grand Orchestra 1st Live \"Overture\"  Midnight Grand Orchestra Blu-ray")
         self.assertEqual(res["price"], float(6800))
         self.assertEqual(res["currency"], "JPY")
         self.assertTrue(res["inStock"])
