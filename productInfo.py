@@ -34,7 +34,8 @@ def otakuRepublicScrape(html):
     res["url"] = soup.find("meta", property="og:url")["content"]
     res["name"] = soup.find("meta", property="og:title")["content"]
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
-    if(soup.find("meta", property="og:availability")["content"] == "instock"):
+    res["currency"] = soup.find("meta", property="og:price:currency")["content"]
+    if(soup.find("meta", property="og:availability")["content"] == "instock"):      #preorders are also listed as instock
         res["inStock"] = True
     else:
         res["inStock"] = False
@@ -47,11 +48,37 @@ def otakuRepublicScrape(html):
 
     return {"success" : True, "res" : res}
 
+#Scraping info from CDJapan
+def cdJapanScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    res = {}
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    #Checking if the url is a product page
+    if(res["url"].find("cdjapan.co.jp/product/") < 0):
+        return {"success" : False}
+
+    res["name"] = soup.find("meta", property="og:title")["content"]
+    res["price"] = float(soup.find("span", itemprop="price")["content"])
+    res["currency"] = "JPY"
+    if(soup.find("a", href="https://www.cdjapan.co.jp/guide/help/shipping/when_will_my_order_ship").get_text().strip() == "Sold Out"):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+    
+    #Request Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 
 ORIGINS = {
     "otakurepublic" : otakuRepublicScrape,
     "goodsrepublic" : otakuRepublicScrape,
-    "japanese-snacks-republic" : otakuRepublicScrape
+    "japanese-snacks-republic" : otakuRepublicScrape,
+    "cdjapan" : cdJapanScrape
 }
 
 def scrapeInfo(url):
@@ -78,4 +105,5 @@ if __name__ == "__main__":
     # req = requestURL("https://otakurepublic.com/product/product_page_5741091.html")["req"]
     # print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
     # print(otakuRepublicScrape(req.text))
-    print(scrapeInfo("https://otakurepublic.com/product/product_page_5741091.html"))
+    # print(scrapeInfo("https://otakurepublic.com/product/product_page_5741091.html"))
+    print(scrapeInfo("https://www.cdjapan.co.jp/product/NEODAI-116550"))
