@@ -7,3 +7,9 @@ A web application that allows users to add items/products using a url of a shopp
 
 ### Python Dependencies
 * pip install beautifulsoup4
+* For selenium
+    * Download a web driver (Firefox in this example https://github.com/mozilla/geckodriver/releases)
+    * Extract from zip
+    * Add the PATH
+    * pip install selenium
+
