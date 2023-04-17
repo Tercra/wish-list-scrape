@@ -79,6 +79,25 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.aitaikujiScrape(productInfo.requestAitaikuji("https://www.aitaikuji.com/series/kirby")["req"])
         self.assertFalse(res["success"])
 
+    def test_estyScrape(self):
+        #Working Product (multi price)
+        res = productInfo.scrapeInfo("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["res"]
+        self.assertEqual(res["name"], "Hololive Vtuber Hoshimachi Suisei Enamel Pin, Fan Merch, Gift")
+        self.assertEqual(res["price"], 17.0)
+        self.assertEqual(res["currency"], "USD")
+        self.assertTrue(res["inStock"])
+        self.assertEqual(res["url"], "https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel")
+        #Image still works(checked)
+
+        #Sold out product (singular price)
+        res = productInfo.scrapeInfo("https://www.etsy.com/listing/262439329/static-noise-tee?click_key=2edd8650d19904a2c6bb557eb76b5ae89f393ec1%3A262439329&click_sum=f3890994&ref=user_profile&sts=1")["res"]
+        self.assertEqual(res["price"], 35.0)
+        self.assertFalse(res["inStock"])
+
+        #Not a product page
+        res = productInfo.scrapeInfo("https://www.etsy.com/people/17cbpocf/favorites/persona?ref=hp_recently_viewed_cl_recs_ref-1&anchor_to_listings=0&rerank_collection=1290886932&dataset=lw")
+        self.assertFalse(res["success"])
+
 
 
 

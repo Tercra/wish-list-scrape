@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup, SoupStrainer
 from selenium import webdriver
 import base64
+import json
 import requests
 import re
 
@@ -117,6 +118,36 @@ def aitaikujiScrape(html):
 
     return {"success" : True, "res" : res}
 
+#Scraping info form Etsy (Doesn't work well with options + out of stock)
+def etsyScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+    infoJSON = soup.find("script", type="application/ld+json")
+
+    if(infoJSON is None):
+        return {"success" : False}
+        
+    infoJSON = json.loads(infoJSON.get_text())
+    res = {}
+    res["url"] = infoJSON["url"]
+    res["name"] = infoJSON["name"]
+    if("highPrice" in infoJSON["offers"].keys()):
+        res["price"] = float(infoJSON["offers"]["highPrice"])
+    else:
+        res["price"] = float(infoJSON["offers"]["price"])
+    res["currency"] = infoJSON["offers"]["priceCurrency"]
+    res["inStock"] =  (infoJSON["offers"]["availability"] == "https://schema.org/InStock")
+
+    #Requesting Image
+    if(type(infoJSON["image"]) is list):
+        imgURL = infoJSON["image"][0]["contentURL"]
+    else:
+        imgURL = infoJSON["image"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+    
+
 
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
@@ -127,7 +158,8 @@ ORIGINS = {
     "goodsrepublic" : otakuRepublicScrape,
     "japanese-snacks-republic" : otakuRepublicScrape,
     "cdjapan" : cdJapanScrape,
-    "aitaikuji" : aitaikujiScrape
+    "aitaikuji" : aitaikujiScrape,
+    "etsy" : etsyScrape
 }
 
 def scrapeInfo(url):
@@ -155,9 +187,9 @@ def scrapeInfo(url):
 
 
 if __name__ == "__main__":
+    # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    # print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
-    # print(otakuRepublicScrape(req.text))
-    # print(scrapeInfo("https://otakurepublic.com/product/product_page_5741091.html"))
-    print(scrapeInfo("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black"))
+    x = scrapeInfo("https://www.etsy.com/listing/262439329/static-noise-tee?click_key=2edd8650d19904a2c6bb557eb76b5ae89f393ec1%3A262439329&click_sum=f3890994&ref=user_profile&sts=1")
+    # with open("./test.txt", "w") as f:
+    #     f.write(x["res"]["img"])
