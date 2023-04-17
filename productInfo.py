@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup, SoupStrainer
+from selenium import webdriver
 import base64
 import requests
 import re
@@ -11,6 +12,23 @@ def requestURL(url):
         print(f"Invalid url: {url}")
     else:
         return {"success" : True, "req":req}
+
+    return {"success" : False}
+
+def requestAitaikuji(url):
+    try:
+        options = webdriver.FirefoxOptions()
+        options.add_argument("-headless")
+        options.set_capability("pageLoadStrategy", "eager")
+        driver = webdriver.Firefox(options=options)
+        driver.get(url)
+        html = driver.page_source
+    except:
+        print(f"Invalid url: {url}")
+    else:
+        return {"success" : True, "req":html}
+    finally:
+        driver.quit()
 
     return {"success" : False}
 
@@ -73,12 +91,43 @@ def cdJapanScrape(html):
 
     return {"success" : True, "res" : res}
 
+#Scraping info from Aitaikuji
+def aitaikujiScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    res = {}
+    temp = soup.find("meta", property="og:type")
+    #Cheking if url is product page
+    if(temp is None or temp["content"] != "og:product"):
+        return {"success" : False}
+
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    res["name"] = soup.find("meta", property="og:title")["content"]
+    res["price"] = float(soup.find("meta", property="product:price:amount")["content"])
+    res["currency"] = soup.find("meta", property="product:price:currency")["content"]
+    if(soup.find("div", title="Availability")["class"][1] == "available"):
+        res["inStock"] = True
+    else:
+        res["inStock"] = False
+
+    #Request Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
+
+SCRAPEMETHODS = {
+    "aitaikuji" : requestAitaikuji
+}
 
 ORIGINS = {
     "otakurepublic" : otakuRepublicScrape,
     "goodsrepublic" : otakuRepublicScrape,
     "japanese-snacks-republic" : otakuRepublicScrape,
-    "cdjapan" : cdJapanScrape
+    "cdjapan" : cdJapanScrape,
+    "aitaikuji" : aitaikujiScrape
 }
 
 def scrapeInfo(url):
@@ -87,12 +136,16 @@ def scrapeInfo(url):
     if(origin == "N/A" or origin not in ORIGINS.keys()):
         return {"success" : False}
 
-    reqResponse = requestURL(url)
+    if(origin in SCRAPEMETHODS.keys()):
+        reqResponse = SCRAPEMETHODS[origin](url)
+        info = ORIGINS[origin](reqResponse["req"])
+    else:
+        reqResponse = requestURL(url)
 
-    if(not reqResponse["success"]):
-        return {"success" : False}
+        if(not reqResponse["success"]):
+            return {"success" : False}
 
-    info = ORIGINS[origin](reqResponse["req"].text)
+        info = ORIGINS[origin](reqResponse["req"].text)
 
     if(info["success"]):
         return {"success" : True, "res" : info["res"]}
@@ -102,8 +155,9 @@ def scrapeInfo(url):
 
 
 if __name__ == "__main__":
-    # req = requestURL("https://otakurepublic.com/product/product_page_5741091.html")["req"]
+    # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
+    # print(req)
     # print(extractOrigin("https://otakurepublic.com/product/product_page_5741091.html"))
     # print(otakuRepublicScrape(req.text))
     # print(scrapeInfo("https://otakurepublic.com/product/product_page_5741091.html"))
-    print(scrapeInfo("https://www.cdjapan.co.jp/product/NEODAI-116550"))
+    print(scrapeInfo("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black"))
