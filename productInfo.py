@@ -156,6 +156,7 @@ def omocatScrape(html):
     res = {}
     infoJSON = soup.find("script", class_="product-json").get_text()
     infoJSON = json.loads(infoJSON)
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
     res["url"] = soup.find("meta", property="og:url")["content"]
     res["name"] = infoJSON["title"]
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
