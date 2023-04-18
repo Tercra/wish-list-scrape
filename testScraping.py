@@ -98,6 +98,25 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.etsy.com/people/17cbpocf/favorites/persona?ref=hp_recently_viewed_cl_recs_ref-1&anchor_to_listings=0&rerank_collection=1290886932&dataset=lw")
         self.assertFalse(res["success"])
 
+    def test_omocatScrape(self):
+        #working product
+        res = productInfo.scrapeInfo("https://www.omocat-shop.com/collections/omocat-x-hololive-en/products/irys-track-jacket")["res"]
+        self.assertEqual(res["name"], "IRyS Track Jacket")
+        self.assertEqual(res["price"], 85.0)
+        self.assertEqual(res["currency"], "USD")
+        self.assertTrue(res["inStock"])
+        self.assertEqual(res["url"], "https://www.omocat-shop.com/products/irys-track-jacket")
+        #image works
+
+
+        #sold out product
+        res = productInfo.scrapeInfo("https://www.omocat-shop.com/collections/omori/products/mewo-pixel-plush")["res"]
+        self.assertFalse(res["inStock"])
+
+        #Not a product page
+        res = productInfo.scrapeInfo("https://www.omocat-shop.com/collections/omori")["success"]
+        self.assertFalse(res)
+
 
 
 

@@ -11,10 +11,9 @@ def requestURL(url):
         req = requests.get(url, headers=header)
     except:
         print(f"Invalid url: {url}")
+        return {"success" : False}
     else:
         return {"success" : True, "req":req}
-
-    return {"success" : False}
 
 def requestAitaikuji(url):
     try:
@@ -26,12 +25,11 @@ def requestAitaikuji(url):
         html = driver.page_source
     except:
         print(f"Invalid url: {url}")
+        return {"success" : False}
     else:
         return {"success" : True, "req":html}
     finally:
         driver.quit()
-
-    return {"success" : False}
 
 def extractOrigin(url):     #Can return None if no match
     m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp)", url)
@@ -118,7 +116,7 @@ def aitaikujiScrape(html):
 
     return {"success" : True, "res" : res}
 
-#Scraping info form Etsy (Doesn't work well with options + out of stock)
+#Scraping info from Etsy (Doesn't work well with options + out of stock)
 def etsyScrape(html):
     soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
     infoJSON = soup.find("script", type="application/ld+json")
@@ -146,7 +144,31 @@ def etsyScrape(html):
     res["img"] = img
 
     return {"success" : True, "res" : res}
+
+#Scraping info from omocat
+def omocatScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    #check if product page
+    if(soup.find("meta", property="og:type")["content"] != "product"):
+        return {"success" : False}
     
+    res = {}
+    infoJSON = soup.find("script", class_="product-json").get_text()
+    infoJSON = json.loads(infoJSON)
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    res["name"] = infoJSON["title"]
+    res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
+    res["currency"] = soup.find("meta", property="og:price:currency")["content"]
+    res["inStock"] = infoJSON["available"]
+
+    #Request Image
+    # imgURL = infoJSON["featured_image"]
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
 
 
 SCRAPEMETHODS = {
@@ -159,7 +181,8 @@ ORIGINS = {
     "japanese-snacks-republic" : otakuRepublicScrape,
     "cdjapan" : cdJapanScrape,
     "aitaikuji" : aitaikujiScrape,
-    "etsy" : etsyScrape
+    "etsy" : etsyScrape,
+    "omocat-shop" : omocatScrape
 }
 
 def scrapeInfo(url):
@@ -190,6 +213,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.etsy.com/listing/262439329/static-noise-tee?click_key=2edd8650d19904a2c6bb557eb76b5ae89f393ec1%3A262439329&click_sum=f3890994&ref=user_profile&sts=1")
+    x = scrapeInfo("https://www.omocat-shop.com/collections/omocat-x-hololive-en/products/tsukumo-sana-varsity-jacket")
+    print(x)
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])
