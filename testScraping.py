@@ -117,7 +117,23 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.omocat-shop.com/collections/omori")["success"]
         self.assertFalse(res)
 
+    def test_crunchyrollScrape(self):
+        #Working product
+        res = productInfo.scrapeInfo("https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")["res"]
+        self.assertEqual(res["name"], "Hololive Production - Nekomata Okayu Pop Up Parade")
+        self.assertEqual(res["price"], 29.99)
+        self.assertEqual(res["currency"], "USD")
+        self.assertEqual(res["url"], "https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")
+        self.assertTrue(res["inStock"])
+        #Working image
 
+        #Sold out product
+        res = productInfo.scrapeInfo("https://store.crunchyroll.com/products/hololive-houshou-marine-figure-anchor-ver-4545784043172.html")["res"]
+        self.assertFalse(res["inStock"])
+
+        #Not product page
+        res = productInfo.scrapeInfo("https://store.crunchyroll.com/collections/clothing/")["success"]
+        self.assertFalse(res)
 
 
 if __name__ == "__main__":

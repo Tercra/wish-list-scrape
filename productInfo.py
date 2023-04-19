@@ -171,6 +171,34 @@ def omocatScrape(html):
 
     return {"success" : True, "res" : res}
 
+#Scraping info from the crunchyroll store
+def crunchyrollScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    #check if product page
+    infoJSON = soup.find("div", class_="product-detail")
+    if(infoJSON is None):
+        return {"success" : False}
+
+    infoJSON = infoJSON["data-segmentdata"]    
+    infoJSON = json.loads(infoJSON)
+    res= {}
+    res["url"] = infoJSON["url"]
+
+    res["name"] = infoJSON["name"]
+    res["price"] = float(infoJSON["price"])
+    res["currency"] = infoJSON["currency"]
+    if(soup.find("div", class_="availability")["data-available"] == "true"):
+        res["inStock"] = True
+    else:
+        res["inStock"] = False
+
+    #Request Image
+    imgURL = "https://store.crunchyroll.com" + infoJSON["image_url"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
 
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
@@ -183,7 +211,8 @@ ORIGINS = {
     "cdjapan" : cdJapanScrape,
     "aitaikuji" : aitaikujiScrape,
     "etsy" : etsyScrape,
-    "omocat-shop" : omocatScrape
+    "omocat-shop" : omocatScrape,
+    "store.crunchyroll" : crunchyrollScrape
 }
 
 def scrapeInfo(url):
@@ -214,7 +243,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.omocat-shop.com/collections/omocat-x-hololive-en/products/tsukumo-sana-varsity-jacket")
-    print(x)
-    # with open("./test.txt", "w") as f:
-    #     f.write(x["res"]["img"])
+    x = scrapeInfo("https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")
+    # print(x)
+    with open("./test.txt", "w") as f:
+        f.write(x["res"]["img"])
