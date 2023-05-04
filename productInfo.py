@@ -31,6 +31,16 @@ def requestAitaikuji(url):
     finally:
         driver.quit()
 
+def requestMelonbooks(url):
+    header = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
+    try:
+        req = requests.get(url + "&adult_view=1", headers=header)
+    except:
+        print(f"Invalid url: {url}")
+        return {"success" : False}
+    else:
+        return {"success" : True, "req":req.text}
+
 def extractOrigin(url):     #Can return None if no match
     m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp)", url)
 
@@ -200,8 +210,34 @@ def crunchyrollScrape(html):
 
     return {"success" : True, "res" : res}
 
+def melonbooksScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    #check if product page
+    res={}
+    res["url"] = soup.find("link", rel="canonical")["href"]
+    if(res["url"].find("melonbooks.co.jp/detail/") < 0):
+        return {"success" : False}
+
+    res["name"] = soup.find("h1", class_="page-header").get_text()
+    res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥"))
+    res["currency"] = "JPY"
+    if(soup.find("span", class_="state-instock").get_text() == "-"):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+
+    #Request Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
+
 SCRAPEMETHODS = {
-    "aitaikuji" : requestAitaikuji
+    "aitaikuji" : requestAitaikuji,
+    "melonbooks" : requestMelonbooks
 }
 
 ORIGINS = {
@@ -212,7 +248,8 @@ ORIGINS = {
     "aitaikuji" : aitaikujiScrape,
     "etsy" : etsyScrape,
     "omocat-shop" : omocatScrape,
-    "store.crunchyroll" : crunchyrollScrape
+    "store.crunchyroll" : crunchyrollScrape,
+    "melonbooks" : melonbooksScrape
 }
 
 def scrapeInfo(url):
@@ -243,7 +280,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")
+    x = scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1628658")
     # print(x)
-    with open("./test.txt", "w") as f:
-        f.write(x["res"]["img"])
+    # with open("./test.txt", "w") as f:
+    #     f.write(x["res"]["img"])

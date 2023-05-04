@@ -135,6 +135,24 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://store.crunchyroll.com/collections/clothing/")["success"]
         self.assertFalse(res)
 
+    def test_melonbooksScrape(self):
+        #working product
+        res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1721255&adult_view=1")["res"]
+        self.assertEqual(res["url"], "https://www.melonbooks.co.jp/detail/detail.php?product_id=1721255")
+        self.assertEqual(res["name"], "月海の果て")
+        self.assertEqual(res["price"], 785.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+        #image works
+
+        #sold out product
+        res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1628658")["res"]
+        self.assertFalse(res["inStock"])
+
+        #Not a product page
+        res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/comic/list.php?category_id=4")
+        self.assertFalse(res["success"])
+
 
 if __name__ == "__main__":
     unittest.main()
