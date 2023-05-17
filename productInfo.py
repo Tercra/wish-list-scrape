@@ -8,9 +8,10 @@ import re
 def requestURL(url):
     header = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
     try:
-        req = requests.get(url, headers=header)
-    except:
+        req = requests.get(url, headers=header, cookies={"AUTH_ADULT" : "1"})
+    except Exception as err:
         print(f"Invalid url: {url}")
+        print(err)
         return {"success" : False}
     else:
         return {"success" : True, "req":req}
@@ -30,16 +31,6 @@ def requestAitaikuji(url):
         return {"success" : True, "req":html}
     finally:
         driver.quit()
-
-def requestMelonbooks(url):
-    header = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
-    try:
-        req = requests.get(url + "&adult_view=1", headers=header)
-    except:
-        print(f"Invalid url: {url}")
-        return {"success" : False}
-    else:
-        return {"success" : True, "req":req.text}
 
 def extractOrigin(url):     #Can return None if no match
     m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp)", url)
@@ -236,8 +227,7 @@ def melonbooksScrape(html):
 
 
 SCRAPEMETHODS = {
-    "aitaikuji" : requestAitaikuji,
-    "melonbooks" : requestMelonbooks
+    "aitaikuji" : requestAitaikuji
 }
 
 ORIGINS = {
@@ -280,7 +270,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1628658")
+    x = scrapeInfo("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")
     # print(x)
-    # with open("./test.txt", "w") as f:
-    #     f.write(x["res"]["img"])
+    with open("./test.txt", "w") as f:
+        f.write(x["res"]["img"])
