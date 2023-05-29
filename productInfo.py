@@ -225,6 +225,31 @@ def melonbooksScrape(html):
 
     return {"success" : True, "res" : res}
 
+def goodsmileScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Check if product page
+    url = soup.find("meta", property="og:url")
+    if(url is None):
+        return {"success" : False}
+
+    # Info
+    res = {"url" : url["content"].replace("http://ap-com.gsls", "https://goodsmileshop.com")}
+    res["name"] = soup.find("div", class_="title").div.h1.get_text(strip=True)
+    res["price"] = float(soup.find("div", class_="big-price").get_text(strip=True).removeprefix("¥").replace(",", ""))
+    res["currency"] = "JPY"
+    stock = soup.find("div", class_="qty").span
+    if(stock.get_text(strip=True) == "Out of Stock"):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+
+    # Request Image
+    imgURL = soup.find("meta", property="og:image")["content"].replace("http://ap-com.gsls", "https://goodsmileshop.com")
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
 
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
@@ -239,7 +264,8 @@ ORIGINS = {
     "etsy" : etsyScrape,
     "omocat-shop" : omocatScrape,
     "store.crunchyroll" : crunchyrollScrape,
-    "melonbooks" : melonbooksScrape
+    "melonbooks" : melonbooksScrape,
+    "goodsmileshop" : goodsmileScrape
 }
 
 def scrapeInfo(url):
@@ -270,7 +296,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")
-    # print(x)
-    with open("./test.txt", "w") as f:
-        f.write(x["res"]["img"])
+    x = scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Goods/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch-Lamperouge/p/GSC_WD_05284")
+    # print(x["res"]["name"])
+    # with open("./test.txt", "w") as f:
+    #     f.write(x["res"]["img"])
