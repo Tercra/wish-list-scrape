@@ -1,3 +1,4 @@
+from ast import parse
 from bs4 import BeautifulSoup, SoupStrainer
 from selenium import webdriver
 import base64
@@ -251,6 +252,31 @@ def goodsmileScrape(html):
 
     return {"success" : True, "res" : res}
 
+def hobbygenkiScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
+
+    # Check if product page
+    url = soup.find("meta", property = "og:url")
+    if(url is None):
+        return {"success" : False}
+
+    # Info
+    res = {"url" : url["content"]}
+    res["name"] = soup.find("meta", property = "og:title")["content"]
+    res["price"] = float(soup.find("meta", property = "product:price:amount")["content"])
+    res["currency"] = soup.find("meta", property = "product:price:currency")["content"]
+    if(soup.find("meta", property = "product:availability")["content"] == "in stock"):
+        res["inStock"] = True
+    else:
+        res["inStock"] = False
+
+    # Request Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -265,7 +291,8 @@ ORIGINS = {
     "omocat-shop" : omocatScrape,
     "store.crunchyroll" : crunchyrollScrape,
     "melonbooks" : melonbooksScrape,
-    "goodsmileshop" : goodsmileScrape
+    "goodsmileshop" : goodsmileScrape,
+    "hobby-genki" : hobbygenkiScrape
 }
 
 def scrapeInfo(url):
@@ -296,7 +323,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Goods/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch-Lamperouge/p/GSC_WD_05284")
-    # print(x["res"]["name"])
-    # with open("./test.txt", "w") as f:
-    #     f.write(x["res"]["img"])
+    x = scrapeInfo("https://hobby-genki.com/en/scale-figures-statues/13635-1-one-slash-ruka-kayamori-heaven-burns-red-17-scale-figure-parco-limited-4580485881012.html")
+    # print(x["res"])
+    with open("./test.txt", "w") as f:
+        f.write(x["res"]["img"])

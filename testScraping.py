@@ -166,5 +166,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Nendoroid/c/133?site=goodsmile-global&lang=en&sessionId=56480E1287294A228B4068B4DA141602.node43")
         self.assertFalse(res["success"])
 
+    def test_hobbygenkiScrape(self):
+        # Working product
+        res = productInfo.scrapeInfo("https://hobby-genki.com/en/scale-figures-statues/13635-1-one-slash-ruka-kayamori-heaven-burns-red-17-scale-figure-parco-limited-4580485881012.html")["res"]
+        self.assertEqual(res["url"], "https://hobby-genki.com/en/scale-figures-statues/13635-1-one-slash-ruka-kayamori-heaven-burns-red-17-scale-figure-parco-limited-4580485881012.html")
+        self.assertEqual(res["name"], "1/ ONE SLASH Ruka Kayamori Heaven Burns Red 1/7 Scale Figure LIMITED")
+        self.assertEqual(res["price"], 30990.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out product
+        res = productInfo.scrapeInfo("https://hobby-genki.com/en/aniplex/17720-hitori-gotoh-tsuchinoko-mendako-ver-bocchi-the-rock-deformed-figure-set-aniplex-limited.html")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not product page
+        res = productInfo.scrapeInfo("https://hobby-genki.com/en/2-accueil")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()
