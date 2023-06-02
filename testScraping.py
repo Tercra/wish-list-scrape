@@ -183,5 +183,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://hobby-genki.com/en/2-accueil")
         self.assertFalse(res["success"])
 
+    def test_solarisjapanScrape(self):
+        # Working Product
+        res = productInfo.scrapeInfo("https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company#")["res"]
+        self.assertEqual(res["url"], "https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company")
+        self.assertEqual(res["name"], "Kantai Collection ~Kan Colle~ - Shigure - 1/7 - Casual Ver. (Good Smile Company)")
+        self.assertEqual(res["price"], 11309.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out product
+        res = productInfo.scrapeInfo("https://solarisjapan.com/collections/figures/products/jujutsu-kaisen-sukuna-jujutsu-kaisen-jukon-no-kata-bandai-spirits#")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not product page
+        res = productInfo.scrapeInfo("https://solarisjapan.com/collections/genshin-impact-figures")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()

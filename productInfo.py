@@ -277,6 +277,31 @@ def hobbygenkiScrape(html):
 
     return {"success" : True, "res" : res}
 
+def solarisjapanScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
+
+    # Check if product page
+    if(soup.find("meta", property = "og:type")["content"] != "product"):
+        return {"success" : False}
+
+    # Info
+    res = {}
+    res["url"] = soup.find("meta", property = "og:url")["content"]
+    res["name"] = soup.find("meta", property = "og:title")["content"]
+    res["price"] = float(soup.find("meta", property = "og:price:amount")["content"].replace(",", ""))
+    res["currency"] = soup.find("meta", property = "og:price:currency")["content"]
+    if(res["price"] == 0):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+
+    # Request Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -292,7 +317,8 @@ ORIGINS = {
     "store.crunchyroll" : crunchyrollScrape,
     "melonbooks" : melonbooksScrape,
     "goodsmileshop" : goodsmileScrape,
-    "hobby-genki" : hobbygenkiScrape
+    "hobby-genki" : hobbygenkiScrape,
+    "solarisjapan" : solarisjapanScrape
 }
 
 def scrapeInfo(url):
@@ -323,7 +349,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://hobby-genki.com/en/scale-figures-statues/13635-1-one-slash-ruka-kayamori-heaven-burns-red-17-scale-figure-parco-limited-4580485881012.html")
+    x = scrapeInfo("https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company#")
     # print(x["res"])
     with open("./test.txt", "w") as f:
         f.write(x["res"]["img"])
