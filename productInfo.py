@@ -34,7 +34,7 @@ def requestAitaikuji(url):
         driver.quit()
 
 def extractOrigin(url):     #Can return None if no match
-    m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp)", url)
+    m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp|jp)", url)
 
     if m is None:
         return "N/A"
@@ -302,6 +302,34 @@ def solarisjapanScrape(html):
 
     return {"success" : True, "res" : res}
 
+def toranoanaScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+
+    # Check if product page
+    info = soup.find("script", type="application/ld+json", string = re.compile("Product"))
+
+    if (info is None):
+        return {"success" : False}
+    info = json.loads(info.get_text())
+    # Info
+    res = {}
+    res["url"] = info["offers"]["url"]
+    res["name"] = info["name"].replace("\u3000", " ")
+    res["price"] = float(info["offers"]["price"])
+    res["currency"] = info["offers"]["priceCurrency"]
+    if(info["offers"]["availability"] == "https://schema.org/SoldOut"):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+
+
+    # Request Image
+    imgURL = info["image"][0]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -318,7 +346,9 @@ ORIGINS = {
     "melonbooks" : melonbooksScrape,
     "goodsmileshop" : goodsmileScrape,
     "hobby-genki" : hobbygenkiScrape,
-    "solarisjapan" : solarisjapanScrape
+    "solarisjapan" : solarisjapanScrape,
+    "ecs.toranoana" : toranoanaScrape,
+    "ec.toranoana" : toranoanaScrape
 }
 
 def scrapeInfo(url):
@@ -349,7 +379,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company#")
+    x = scrapeInfo("https://ec.toranoana.jp/tora_r/ec/item/040030247626/")
     # print(x["res"])
-    with open("./test.txt", "w") as f:
-        f.write(x["res"]["img"])
+    # with open("./test.txt", "w") as f:
+    #     f.write(x["res"]["img"])

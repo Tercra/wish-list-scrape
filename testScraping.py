@@ -200,5 +200,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://solarisjapan.com/collections/genshin-impact-figures")
         self.assertFalse(res["success"])
 
+    def test_toranoanaScrape(self):
+        # Working product page
+        res = productInfo.scrapeInfo("https://ecs.toranoana.jp/tora/ec/item/040030755120/")["res"]
+        self.assertEqual(res["url"], "https://ecs.toranoana.jp/tora/ec/item/040030755120/")
+        self.assertEqual(res["name"], "かるいカルデア ４")
+        self.assertEqual(res["price"], 785.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out page
+        res = productInfo.scrapeInfo("https://ec.toranoana.jp/tora_r/ec/item/040030247626/")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not product page
+        res = productInfo.scrapeInfo("https://ecs.toranoana.jp/tora/ec/cot/")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()
