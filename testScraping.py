@@ -234,5 +234,18 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.hlj.com/")
         self.assertFalse(res["success"])
 
+    def test_dlsiteScrape(self):
+        # Working product page
+        res = productInfo.scrapeInfo("https://www.dlsite.com/home/work/=/product_id/RJ295773.html/?locale=en_US")["res"]
+        self.assertEqual(res["url"], "https://www.dlsite.com/home/work/=/product_id/RJ295773.html")
+        self.assertEqual(res["name"], "#GensoukyouHoloism [English Ver.]")
+        self.assertEqual(res["price"], 2200.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Not a product page
+        res = productInfo.scrapeInfo("https://www.dlsite.com/home/")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()

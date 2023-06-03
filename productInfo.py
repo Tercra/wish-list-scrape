@@ -357,6 +357,30 @@ def hljScrape(html):
 
     return {"success" : True, "res" : res}
 
+def dlsiteScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Check if Product page
+    url = soup.find("meta", property="og:url")
+    if(url is None):
+        return {"success" : False}
+
+    # Info
+    info = soup.find("div", attrs={"data-price" : True})
+    res = {}
+    res["url"] = url["content"]
+    res["name"] = info["data-work_name"]
+    res["price"] = float(info["data-price"])
+    res["currency"] = "JPY"
+    res["inStock"] = True                   #Digital item so always true
+
+    # Request an Image
+    imgURL = soup.find("meta", property="og:image")["content"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -376,7 +400,8 @@ ORIGINS = {
     "solarisjapan" : solarisjapanScrape,
     "ecs.toranoana" : toranoanaScrape,
     "ec.toranoana" : toranoanaScrape,
-    "hlj" : hljScrape
+    "hlj" : hljScrape,
+    "dlsite" : dlsiteScrape
 }
 
 def scrapeInfo(url):
@@ -407,7 +432,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.hlj.com/1-7-scale-fate-grand-order-lancer-caenis-figure-gsc94453")
+    x = scrapeInfo("https://www.dlsite.com/home/work/=/product_id/RJ295773.html/?locale=en_US")
     # print(x["res"])
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])
