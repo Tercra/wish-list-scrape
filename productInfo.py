@@ -330,6 +330,33 @@ def toranoanaScrape(html):
 
     return {"success" : True, "res" : res}
 
+def hljScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+
+    # Check if product page
+    info = soup.find("script", type = "application/ld+json")
+    if(info is None):
+        return {"success" : False}
+
+    # Info
+    info = json.loads(info.get_text())
+    res = {}
+    res["url"] = info["offers"]["url"]
+    res["name"] = info["name"]
+    res["price"] = float(info["offers"]["price"])
+    res["currency"] = info["offers"]["priceCurrency"]
+    if((info["offers"]["availability"] == "https://schema.org/InStock") or (info["offers"]["availability"] == "https://schema.org/PreOrder")):
+        res["inStock"] = True
+    else:
+        res["inStock"] = False
+
+    # Request Image
+    imgURL = info["image"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -348,7 +375,8 @@ ORIGINS = {
     "hobby-genki" : hobbygenkiScrape,
     "solarisjapan" : solarisjapanScrape,
     "ecs.toranoana" : toranoanaScrape,
-    "ec.toranoana" : toranoanaScrape
+    "ec.toranoana" : toranoanaScrape,
+    "hlj" : hljScrape
 }
 
 def scrapeInfo(url):
@@ -379,7 +407,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://ec.toranoana.jp/tora_r/ec/item/040030247626/")
+    x = scrapeInfo("https://www.hlj.com/1-7-scale-fate-grand-order-lancer-caenis-figure-gsc94453")
     # print(x["res"])
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])

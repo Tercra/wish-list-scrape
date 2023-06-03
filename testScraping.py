@@ -217,5 +217,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://ecs.toranoana.jp/tora/ec/cot/")
         self.assertFalse(res["success"])
 
+    def test_hljScrape(self):
+        # Working product page
+        res = productInfo.scrapeInfo("https://www.hlj.com/1-7-scale-fate-grand-order-lancer-caenis-figure-gsc94453")["res"]
+        self.assertEqual(res["url"], "https://www.hlj.com/product/GSC94453/")
+        self.assertEqual(res["name"], "1/7 Fate/Grand Order Lancer/Caenis Figure")
+        self.assertEqual(res["price"], 22902.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out page
+        res = productInfo.scrapeInfo("https://www.hlj.com/1-8-scale-fate-grand-order-alter-ego-meltryllis-pvc-alt20617?utm_source=tumblr.com&utm_medium=social&utm_content=&utm_campaign=1/8%20Fate/Grand%20Order:%20Alter%20Ego%20Meltryllis%20PVC")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not a product page
+        res = productInfo.scrapeInfo("https://www.hlj.com/")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()
