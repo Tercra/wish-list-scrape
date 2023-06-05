@@ -413,6 +413,26 @@ def boothScrape(html):
 
     return {"success" : True, "res" : res}
 
+def bookwalkerScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+
+    # Check if product page
+    info = soup.find("script", type = "application/ld+json")
+    if(info is None):
+        return {"success" : False}
+
+    # Info
+    info = json.loads(info.get_text())
+    res = {}
+    res["url"] = info["url"]
+    res["name"] = info["name"]
+    res["price"] = float(info["offers"][0]["price"])
+    res["currency"] = info["offers"][0]["priceCurrency"]
+    res["inStock"] = True
+    res["image"] = info["image"]
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -434,7 +454,8 @@ ORIGINS = {
     "ec.toranoana" : toranoanaScrape,
     "hlj" : hljScrape,
     "dlsite" : dlsiteScrape,
-    "booth" : boothScrape
+    "booth" : boothScrape,
+    "global.bookwalker" : bookwalkerScrape
 }
 
 def scrapeInfo(url):
@@ -465,7 +486,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://booth.pm/en/items/1482245")
-    # print(x["res"])
-    with open("./test.txt", "w") as f:
-        f.write(x["res"]["img"])
+    x = scrapeInfo("https://global.bookwalker.jp/de41ac8341-d35f-41c5-b0e4-6437de32ef2a/")
+    print(x["res"])
+    # with open("./test.txt", "w") as f:
+    #     f.write(x["res"]["img"])

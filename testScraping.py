@@ -268,5 +268,13 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://booth.pm/en")
         self.assertFalse(res["success"])
 
+    def test_bookwalkerScrape(self):
+        res = productInfo.scrapeInfo("https://global.bookwalker.jp/de41ac8341-d35f-41c5-b0e4-6437de32ef2a/")["res"]
+        self.assertEqual(res["url"], "https://global.bookwalker.jp/de41ac8341-d35f-41c5-b0e4-6437de32ef2a/")
+        self.assertEqual(res["name"], "5 Seconds Before a Witch Falls in Love")
+        self.assertEqual(res["price"], 1000.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
 if __name__ == "__main__":
     unittest.main()
