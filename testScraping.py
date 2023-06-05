@@ -247,5 +247,26 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.dlsite.com/home/")
         self.assertFalse(res["success"])
 
+    def test_boothScrape(self):
+        # Working product
+        res = productInfo.scrapeInfo("https://booth.pm/en/items/1482245")["res"]
+        self.assertEqual(res["url"], "https://booth.pm/ja/items/1482245")
+        self.assertEqual(res["name"], "舞風-Maikaze Original Vocal Songs Archives 2006～2018")
+        self.assertEqual(res["price"], 2200.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out product
+        res = productInfo.scrapeInfo("https://yuusa.booth.pm/items/1979778")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Sold out product button disabled
+        res = productInfo.scrapeInfo("https://maikazeshop.booth.pm/items/4596085")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not product page
+        res = productInfo.scrapeInfo("https://booth.pm/en")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()

@@ -34,12 +34,16 @@ def requestAitaikuji(url):
         driver.quit()
 
 def extractOrigin(url):     #Can return None if no match
-    m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp|jp)", url)
+    m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp|jp|pm)", url)
 
     if m is None:
         return "N/A"
 
-    return m.group(3)
+    res = m.group(3)
+    if(res.find("booth") < 0):
+        return res
+    else:
+        return "booth"              #To account for username.booth for booth sites    
 
 #Scraping info from otaku republic and sister sites
 def otakuRepublicScrape(html):
@@ -381,6 +385,34 @@ def dlsiteScrape(html):
 
     return {"success" : True, "res" : res}
 
+def boothScrape(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Check Product
+    info = soup.find("script", type="application/ld+json", string=re.compile("Product"))
+    if (info is None):
+        return {"success" : False}
+
+    # Info
+    info = json.loads(info.get_text())
+    res = {}
+    res["url"] = info["url"]
+    res["name"] = info["name"]
+    res["price"] = float(info["offers"]["price"])
+    res["currency"] = info["offers"]["priceCurrency"]
+    butt = soup.find("button", class_="add-cart")
+    if((butt is None) or ("disabled" in butt["class"])):
+        res["inStock"] = False
+    else:
+        res["inStock"] = True
+
+    # Request Image
+    imgURL = info["image"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -401,7 +433,8 @@ ORIGINS = {
     "ecs.toranoana" : toranoanaScrape,
     "ec.toranoana" : toranoanaScrape,
     "hlj" : hljScrape,
-    "dlsite" : dlsiteScrape
+    "dlsite" : dlsiteScrape,
+    "booth" : boothScrape
 }
 
 def scrapeInfo(url):
@@ -432,7 +465,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.dlsite.com/home/work/=/product_id/RJ295773.html/?locale=en_US")
+    x = scrapeInfo("https://booth.pm/en/items/1482245")
     # print(x["res"])
-    # with open("./test.txt", "w") as f:
-    #     f.write(x["res"]["img"])
+    with open("./test.txt", "w") as f:
+        f.write(x["res"]["img"])

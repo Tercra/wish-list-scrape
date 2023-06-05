@@ -3,7 +3,13 @@ A web application that allows users to add items/products using a url of a shopp
 
 
 ## Parts
-* Python script to scrape websites based on url
+* productinfo.py
+    * Python script that scrapes info form configured websites (url, name, price, currency, image)
+* testScraping.py
+    * Unittest to test methods in productinfo.py
+    * Test will not work in time, because certain info like price and availibility will change in time
+
+#
 
 ### Python Dependencies
 * pip install beautifulsoup4
