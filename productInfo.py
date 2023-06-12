@@ -398,7 +398,10 @@ def boothScrape(html):
     res = {}
     res["url"] = info["url"]
     res["name"] = info["name"]
-    res["price"] = float(info["offers"]["price"])
+    if(info["offers"].get("price")):
+        res["price"] = float(info["offers"]["price"])
+    else:
+        res["price"] = float(info["offers"]["highPrice"])
     res["currency"] = info["offers"]["priceCurrency"]
     butt = soup.find("button", class_="add-cart")
     if((butt is None) or ("disabled" in butt["class"])):

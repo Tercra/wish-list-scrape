@@ -268,6 +268,10 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://booth.pm/en")
         self.assertFalse(res["success"])
 
+        # Different price option
+        res = productInfo.scrapeInfo("https://otakuhane.booth.pm/items/4815715")["res"]
+        self.assertEqual(res["price"], 990.0)
+
     def test_bookwalkerScrape(self):
         # Working product page
         res = productInfo.scrapeInfo("https://global.bookwalker.jp/de41ac8341-d35f-41c5-b0e4-6437de32ef2a/")["res"]
