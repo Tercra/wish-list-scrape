@@ -285,5 +285,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://global.bookwalker.jp/genre/14/?np=0&page=1")
         self.assertFalse(res["success"])
 
+    def test_usagundamstoreScrape(self):
+        # Working product page
+        res = productInfo.scrapeInfo("https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru?variant=41171106758853")["res"]
+        self.assertEqual(res["url"], "https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru")
+        self.assertEqual(res["name"], "Fate/Grand Carnival Pop Up Parade Ritsuka Fujimaru")
+        self.assertEqual(res["price"], 38.99)
+        self.assertEqual(res["currency"], "USD")
+        self.assertTrue(res["inStock"])
+
+        # Sold out product page
+        res = productInfo.scrapeInfo("https://www.usagundamstore.com/products/digimon-tamers-figure-rise-standard-amplified-dukemon-gallantmon?variant=38049604337861")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not a product page
+        res = productInfo.scrapeInfo("https://www.usagundamstore.com/pages/search-results-page?collection=all")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()

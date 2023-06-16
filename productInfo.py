@@ -436,6 +436,31 @@ def bookwalkerScrape(html):
 
     return {"success" : True, "res" : res}
 
+def usagundamScrape(html):
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+
+    # Check if product page
+    info = soup.find("script", type="application/json", id="ProductJson-nov-product-template")
+    if(info is None):
+        return {"success" : False}
+
+    # Info
+    info = json.loads(info.get_text())
+    res = {}
+    res["url"] = "https://www.usagundamstore.com" + info["url"]
+    res["name"] = info["title"]
+    p = str(info["price"])
+    res["price"] = float(p[0:-2] + "." + p[-2:])
+    res["currency"] = "USD"
+    res["inStock"] = info["variants"][0]["available"]
+
+    # Request Image
+    imgURL = "https:" + info["featured_image"]
+    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
+    res["img"] = img
+
+    return {"success" : True, "res" : res}
+
 SCRAPEMETHODS = {
     "aitaikuji" : requestAitaikuji
 }
@@ -458,7 +483,8 @@ ORIGINS = {
     "hlj" : hljScrape,
     "dlsite" : dlsiteScrape,
     "booth" : boothScrape,
-    "global.bookwalker" : bookwalkerScrape
+    "global.bookwalker" : bookwalkerScrape,
+    "usagundamstore" : usagundamScrape
 }
 
 def scrapeInfo(url):
@@ -489,7 +515,7 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://global.bookwalker.jp/de41ac8341-d35f-41c5-b0e4-6437de32ef2a/")
-    print(x["res"])
+    x = scrapeInfo("https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru?variant=41171106758853")
+    # print(x["res"])
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])
