@@ -302,5 +302,22 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.usagundamstore.com/pages/search-results-page?collection=all")
         self.assertFalse(res["success"])
 
+    def test_surugayaScrape(self):
+        # Working product page
+        res = productInfo.scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")["res"]
+        self.assertEqual(res["url"], "https://www.suruga-ya.jp/product/detail/ZHOA71527")
+        self.assertEqual(res["name"], "&lt;&lt;ラブライブ！&gt;&gt; わたしのムスコは欲しがりで。 / ぼっち飯")
+        self.assertEqual(res["price"], 400.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        # Sold out product page
+        res = productInfo.scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHORE196603?tenpo_cd=")["res"]
+        self.assertFalse(res["inStock"])
+
+        # Not a product page
+        res = productInfo.scrapeInfo("https://www.suruga-ya.jp/")
+        self.assertFalse(res["success"])
+
 if __name__ == "__main__":
     unittest.main()
