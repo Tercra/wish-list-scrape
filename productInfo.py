@@ -10,10 +10,12 @@ def requestURL(url):
     header = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
     try:
         req = requests.get(url, headers=header, cookies={"AUTH_ADULT" : "1"})
+        if(req.status_code == 404):
+            return {"success" : False, "error" : "404 Status Code"}
     except Exception as err:
         print(f"Invalid url: {url}")
         print(err)
-        return {"success" : False}
+        return {"success" : False, "error" : "Exception in requestURL"}
     else:
         return {"success" : True, "req":req}
 

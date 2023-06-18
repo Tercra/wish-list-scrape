@@ -57,6 +57,10 @@ class TestScrapingMethods(unittest.TestCase):
         #Not a product page
         res = productInfo.cdJapanScrape(productInfo.requestURL("https://www.cdjapan.co.jp/toys/")["req"].text)
         self.assertFalse(res["success"])
+
+        # Invalid product side
+        res = productInfo.scrapeInfo("https://www.cdjapan.co.jp/product/NEODAI-")
+        self.assertFalse(res["success"])
         
     def test_aitaikujiScrape(self):
         #Working product page
@@ -147,6 +151,10 @@ class TestScrapingMethods(unittest.TestCase):
 
         #Not a product page
         res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/comic/list.php?category_id=4")
+        self.assertFalse(res["success"])
+
+        # Invalid product side
+        res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1721")
         self.assertFalse(res["success"])
 
     def test_goodsmileScrape(self):
