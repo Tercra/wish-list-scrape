@@ -75,7 +75,6 @@ def cdJapanScrape(html):
     if(res["url"].find("cdjapan.co.jp/product/") < 0):
         return {"success" : False}
 
-    res["name"] = soup.find("meta", property="og:title")["content"].strip()
     res["price"] = float(soup.find("span", itemprop="price")["content"])
     res["currency"] = "JPY"
     if(soup.find("a", href="https://www.cdjapan.co.jp/guide/help/shipping/when_will_my_order_ship").get_text().strip() == "Sold Out"):
@@ -83,11 +82,6 @@ def cdJapanScrape(html):
     else:
         res["inStock"] = True
     
-    #Request Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
-
     return {"success" : True, "res" : res}
 
 #Scraping info from Aitaikuji
@@ -100,19 +94,12 @@ def aitaikujiScrape(html):
     if(temp is None or temp["content"] != "og:product"):
         return {"success" : False}
 
-    res["url"] = soup.find("meta", property="og:url")["content"]
-    res["name"] = soup.find("meta", property="og:title")["content"]
     res["price"] = float(soup.find("meta", property="product:price:amount")["content"])
     res["currency"] = soup.find("meta", property="product:price:currency")["content"]
     if(soup.find("div", title="Availability")["class"][1] == "available"):
         res["inStock"] = True
     else:
         res["inStock"] = False
-
-    #Request Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -126,22 +113,12 @@ def etsyScrape(html):
         
     infoJSON = json.loads(infoJSON.get_text())
     res = {}
-    res["url"] = infoJSON["url"]
-    res["name"] = infoJSON["name"]
     if("highPrice" in infoJSON["offers"].keys()):
         res["price"] = float(infoJSON["offers"]["highPrice"])
     else:
         res["price"] = float(infoJSON["offers"]["price"])
     res["currency"] = infoJSON["offers"]["priceCurrency"]
     res["inStock"] =  (infoJSON["offers"]["availability"] == "https://schema.org/InStock")
-
-    #Requesting Image
-    if(type(infoJSON["image"]) is list):
-        imgURL = infoJSON["image"][0]["contentURL"]
-    else:
-        imgURL = infoJSON["image"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -157,17 +134,9 @@ def omocatScrape(html):
     infoJSON = soup.find("script", class_="product-json").get_text()
     infoJSON = json.loads(infoJSON)
     soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
-    res["url"] = soup.find("meta", property="og:url")["content"]
-    res["name"] = infoJSON["title"]
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
     res["currency"] = soup.find("meta", property="og:price:currency")["content"]
     res["inStock"] = infoJSON["available"]
-
-    #Request Image
-    # imgURL = infoJSON["featured_image"]
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -182,21 +151,14 @@ def crunchyrollScrape(html):
 
     infoJSON = infoJSON["data-segmentdata"]    
     infoJSON = json.loads(infoJSON)
-    res= {}
-    res["url"] = infoJSON["url"]
 
-    res["name"] = infoJSON["name"]
+    res= {}
     res["price"] = float(infoJSON["price"])
     res["currency"] = infoJSON["currency"]
     if(soup.find("div", class_="availability")["data-available"] == "true"):
         res["inStock"] = True
     else:
         res["inStock"] = False
-
-    #Request Image
-    imgURL = "https://store.crunchyroll.com" + infoJSON["image_url"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -209,18 +171,12 @@ def melonbooksScrape(html):
     if(res["url"].find("melonbooks.co.jp/detail/") < 0):
         return {"success" : False}
 
-    res["name"] = soup.find("h1", class_="page-header").get_text()
     res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥"))
     res["currency"] = "JPY"
     if(soup.find("span", class_="state-instock").get_text() == "-"):
         res["inStock"] = False
     else:
         res["inStock"] = True
-
-    #Request Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -233,8 +189,7 @@ def goodsmileScrape(html):
         return {"success" : False}
 
     # Info
-    res = {"url" : url["content"].replace("http://ap-com.gsls", "https://goodsmileshop.com")}
-    res["name"] = soup.find("div", class_="title").div.h1.get_text(strip=True)
+    res = {}
     res["price"] = float(soup.find("div", class_="big-price").get_text(strip=True).removeprefix("¥").replace(",", ""))
     res["currency"] = "JPY"
     stock = soup.find("div", class_="qty").span
@@ -242,11 +197,6 @@ def goodsmileScrape(html):
         res["inStock"] = False
     else:
         res["inStock"] = True
-
-    # Request Image
-    imgURL = soup.find("meta", property="og:image")["content"].replace("http://ap-com.gsls", "https://goodsmileshop.com")
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -259,19 +209,13 @@ def hobbygenkiScrape(html):
         return {"success" : False}
 
     # Info
-    res = {"url" : url["content"]}
-    res["name"] = soup.find("meta", property = "og:title")["content"]
+    res = {}
     res["price"] = float(soup.find("meta", property = "product:price:amount")["content"])
     res["currency"] = soup.find("meta", property = "product:price:currency")["content"]
     if(soup.find("meta", property = "product:availability")["content"] == "in stock"):
         res["inStock"] = True
     else:
         res["inStock"] = False
-
-    # Request Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -284,19 +228,12 @@ def solarisjapanScrape(html):
 
     # Info
     res = {}
-    res["url"] = soup.find("meta", property = "og:url")["content"]
-    res["name"] = soup.find("meta", property = "og:title")["content"]
     res["price"] = float(soup.find("meta", property = "og:price:amount")["content"].replace(",", ""))
     res["currency"] = soup.find("meta", property = "og:price:currency")["content"]
     if(res["price"] == 0):
         res["inStock"] = False
     else:
         res["inStock"] = True
-
-    # Request Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -311,20 +248,12 @@ def toranoanaScrape(html):
     info = json.loads(info.get_text())
     # Info
     res = {}
-    res["url"] = info["offers"]["url"]
-    res["name"] = info["name"].replace("\u3000", " ")
     res["price"] = float(info["offers"]["price"])
     res["currency"] = info["offers"]["priceCurrency"]
     if(info["offers"]["availability"] == "https://schema.org/SoldOut"):
         res["inStock"] = False
     else:
         res["inStock"] = True
-
-
-    # Request Image
-    imgURL = info["image"][0]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -339,19 +268,12 @@ def hljScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
-    res["url"] = info["offers"]["url"]
-    res["name"] = info["name"]
     res["price"] = float(info["offers"]["price"])
     res["currency"] = info["offers"]["priceCurrency"]
     if((info["offers"]["availability"] == "https://schema.org/InStock") or (info["offers"]["availability"] == "https://schema.org/PreOrder")):
         res["inStock"] = True
     else:
         res["inStock"] = False
-
-    # Request Image
-    imgURL = info["image"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -366,16 +288,9 @@ def dlsiteScrape(html):
     # Info
     info = soup.find("div", attrs={"data-price" : True})
     res = {}
-    res["url"] = url["content"]
-    res["name"] = info["data-work_name"]
     res["price"] = float(info["data-price"])
     res["currency"] = "JPY"
     res["inStock"] = True                   #Digital item so always true
-
-    # Request an Image
-    imgURL = soup.find("meta", property="og:image")["content"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -390,8 +305,6 @@ def boothScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
-    res["url"] = info["url"]
-    res["name"] = info["name"]
     if(info["offers"].get("price")):
         res["price"] = float(info["offers"]["price"])
     else:
@@ -402,11 +315,6 @@ def boothScrape(html):
         res["inStock"] = False
     else:
         res["inStock"] = True
-
-    # Request Image
-    imgURL = info["image"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -421,12 +329,9 @@ def bookwalkerScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
-    res["url"] = info["url"]
-    res["name"] = info["name"]
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     res["inStock"] = True
-    res["image"] = info["image"]
 
     return {"success" : True, "res" : res}
 
@@ -441,17 +346,10 @@ def usagundamScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
-    res["url"] = "https://www.usagundamstore.com" + info["url"]
-    res["name"] = info["title"]
     p = str(info["price"])
     res["price"] = float(p[0:-2] + "." + p[-2:])
     res["currency"] = "USD"
     res["inStock"] = info["variants"][0]["available"]
-
-    # Request Image
-    imgURL = "https:" + info["featured_image"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
@@ -467,8 +365,6 @@ def surugayaScrape(html):
     info = info.get_text().strip()
     info = json.loads(info[1:-1])
     res = {}
-    res["url"] = info["url"]
-    res["name"] = info["name"]
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     stock = soup.find("div", class_="out-of-stock-text")
@@ -476,11 +372,6 @@ def surugayaScrape(html):
         res["inStock"] = True
     else:
         res["inStock"] = False
-
-    # Request image
-    imgURL = info["image"]
-    img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
-    res["img"] = img
 
     return {"success" : True, "res" : res}
 
