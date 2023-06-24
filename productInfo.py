@@ -537,7 +537,7 @@ def scrapeInfo(url):
         info = ORIGINS[origin](reqResponse["req"].text)
 
     if(info["success"]):
-        return {"success" : True, "res" : info["res"]}
+        return {"success" : True, "res" : info["res"], "origin" : origin}
     
     return {"success" : False}
     
