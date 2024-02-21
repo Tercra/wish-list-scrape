@@ -336,20 +336,20 @@ def bookwalkerScrape(html):
     return {"success" : True, "res" : res}
 
 def usagundamScrape(html):
-    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
 
     # Check if product page
-    info = soup.find("script", type="application/json", id="ProductJson-nov-product-template")
-    if(info is None):
+    if(soup.find("meta", property="og:type")["content"] != "product"):
         return {"success" : False}
 
     # Info
-    info = json.loads(info.get_text())
     res = {}
-    p = str(info["price"])
-    res["price"] = float(p[0:-2] + "." + p[-2:])
-    res["currency"] = "USD"
-    res["inStock"] = info["variants"][0]["available"]
+    url = soup.find("meta", property="og:url")["content"]
+    info = requestURL(url + ".oembed")["req"].json()
+
+    res["price"] = float(info["offers"][0]["price"])
+    res["currency"] = info["offers"][0]["currency_code"]
+    res["inStock"] = info["offers"][0]["in_stock"]
 
     return {"success" : True, "res" : res}
 
