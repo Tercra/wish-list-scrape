@@ -5,6 +5,7 @@ import base64
 import json
 import requests
 import re
+import os
 
 def requestURL(url):
     header = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
@@ -34,6 +35,16 @@ def requestAitaikuji(url):
         return {"success" : True, "req":html}
     finally:
         driver.quit()
+
+def saveImage(name, url):
+    img = requestURL(url)["req"].content
+    path = os.path.join("./images", name)
+
+    # Check if there is already a image for the product saved
+    if(os.path.isfile(path) == False):
+        with open(path, "wb") as f:
+            f.write(img)
+    return path
 
 def extractOrigin(url):     #Can return None if no match
     m = re.search(r"^(https://)?(www\.)?(\S+?)\.(com|co\.jp|jp|pm)", url)
@@ -547,7 +558,8 @@ if __name__ == "__main__":
     # pass
     # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
     # print(req)
-    x = scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")
+    # x = scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")
     # print(x["res"])
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])
+    # saveImage("test test.png", "https://otakurepublic.com/media/binary/003/066/832/3066832.jpg")
