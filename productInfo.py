@@ -39,9 +39,8 @@ def requestAitaikuji(url):
 def saveImage(name, url):
     img = requestURL(url)["req"].content
     # Sanitize the name as it might contain characters that cause problems
-    temp = name.replace("/", "-")
-    temp = temp.replace("\\", "-")
-    temp = temp.replace(".", "*")
+    temp = re.sub(r"[/\\]", "-", name)
+    temp = re.sub(r"[#%&{}<>*?/$!'\":@+`|=]", "", temp)
     path = os.path.join("./images", (temp + ".png"))
 
     # Check if there is already a image for the product saved
