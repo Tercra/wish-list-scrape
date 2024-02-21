@@ -38,7 +38,7 @@ def requestAitaikuji(url):
 
 def saveImage(name, url):
     img = requestURL(url)["req"].content
-    path = os.path.join("./images", name)
+    path = os.path.join("./images", (name + ".png"))
 
     # Check if there is already a image for the product saved
     if(os.path.isfile(path) == False):
@@ -450,25 +450,24 @@ def bookwalkerScrape(html):
     return {"success" : True, "res" : res}
 
 def usagundamScrape(html):
-    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("script"))
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
 
     # Check if product page
-    info = soup.find("script", type="application/json", id="ProductJson-nov-product-template")
-    if(info is None):
+    if(soup.find("meta", property="og:type")["content"] != "product"):
         return {"success" : False}
 
     # Info
-    info = json.loads(info.get_text())
     res = {}
-    res["url"] = "https://www.usagundamstore.com" + info["url"]
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    info = requestURL(res["url"] + ".oembed")["req"].json()
+
     res["name"] = info["title"]
-    p = str(info["price"])
-    res["price"] = float(p[0:-2] + "." + p[-2:])
-    res["currency"] = "USD"
-    res["inStock"] = info["variants"][0]["available"]
+    res["price"] = float(info["offers"][0]["price"])
+    res["currency"] = info["offers"][0]["currency_code"]
+    res["inStock"] = info["offers"][0]["in_stock"]
 
     # Request Image
-    imgURL = "https:" + info["featured_image"]
+    imgURL = soup.find("meta", property="og:image:secure_url")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
@@ -543,7 +542,7 @@ def scrapeInfo(url):
         reqResponse = requestURL(url)
 
         if(not reqResponse["success"]):
-            return {"success" : False}
+            return {"success" : False, "msg" : "Request URL failed"}
 
         info = ORIGINS[origin](reqResponse["req"].text)
 
@@ -556,9 +555,10 @@ def scrapeInfo(url):
 
 if __name__ == "__main__":
     # pass
-    # req = requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"]
-    # print(req)
-    x = scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")
+    # req = requestURL("https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru.oembed")["req"]
+    # print(req.json())
+    x = scrapeInfo("https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru?variant=41171106758853")
+    print(x)
     # print(x["res"])
     # with open("./test.txt", "w") as f:
     #     f.write(x["res"]["img"])
