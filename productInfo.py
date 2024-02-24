@@ -85,6 +85,8 @@ def otakuRepublicScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Republic"
+
     return {"success" : True, "res" : res}
 
 #Scraping info from CDJapan
@@ -109,6 +111,8 @@ def cdJapanScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "CDJapan"
 
     return {"success" : True, "res" : res}
 
@@ -135,6 +139,8 @@ def aitaikujiScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "Aitaikuji"
 
     return {"success" : True, "res" : res}
 
@@ -165,6 +171,8 @@ def etsyScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Etsy"
+
     return {"success" : True, "res" : res}
 
 #Scraping info from omocat
@@ -190,6 +198,8 @@ def omocatScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "Omocat"
 
     return {"success" : True, "res" : res}
 
@@ -220,6 +230,8 @@ def crunchyrollScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Crunchyroll"
+
     return {"success" : True, "res" : res}
 
 def melonbooksScrape(html):
@@ -243,6 +255,8 @@ def melonbooksScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "Melonbooks"
 
     return {"success" : True, "res" : res}
 
@@ -270,6 +284,8 @@ def goodsmileScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "GoodSmile"
+
     return {"success" : True, "res" : res}
 
 def hobbygenkiScrape(html):
@@ -295,6 +311,8 @@ def hobbygenkiScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Hobby Genki"
+
     return {"success" : True, "res" : res}
 
 def solarisjapanScrape(html):
@@ -319,6 +337,8 @@ def solarisjapanScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "Solaris Japan"
 
     return {"success" : True, "res" : res}
 
@@ -348,6 +368,8 @@ def toranoanaScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Toranoana"
+
     return {"success" : True, "res" : res}
 
 def hljScrape(html):
@@ -375,6 +397,8 @@ def hljScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "HobbyLink Japan"
+
     return {"success" : True, "res" : res}
 
 def dlsiteScrape(html):
@@ -398,6 +422,8 @@ def dlsiteScrape(html):
     imgURL = soup.find("meta", property="og:image")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "DLSite"
 
     return {"success" : True, "res" : res}
 
@@ -430,6 +456,8 @@ def boothScrape(html):
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
 
+    res["origin"] = "Booth"
+
     return {"success" : True, "res" : res}
 
 def bookwalkerScrape(html):
@@ -449,6 +477,8 @@ def bookwalkerScrape(html):
     res["currency"] = info["offers"][0]["priceCurrency"]
     res["inStock"] = True
     res["image"] = info["image"]
+
+    res["origin"] = "BookWalker"
 
     return {"success" : True, "res" : res}
 
@@ -473,6 +503,8 @@ def usagundamScrape(html):
     imgURL = soup.find("meta", property="og:image:secure_url")["content"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "USA Gundam"
 
     return {"success" : True, "res" : res}
 
@@ -502,6 +534,8 @@ def surugayaScrape(html):
     imgURL = info["image"]
     # img = "data:image/jpeg;base64," + base64.b64encode(requestURL(imgURL)["req"].content).decode("utf-8")
     res["img"] = saveImage(res["name"], imgURL)
+
+    res["origin"] = "Surugaya"
 
     return {"success" : True, "res" : res}
 
@@ -550,7 +584,7 @@ def scrapeInfo(url):
         info = ORIGINS[origin](reqResponse["req"].text)
 
     if(info["success"]):
-        return {"success" : True, "res" : info["res"], "origin" : origin}
+        return {"success" : True, "res" : info["res"]}
     
     return {"success" : False, "msg" : info["msg"]}
     

@@ -62,6 +62,8 @@ def otakuRepublicScrape(html):
         res["inStock"] = True
     else:
         res["inStock"] = False
+
+    res["origin"] = "Republic"
     
     return {"success" : True, "res" : res}
 
@@ -81,6 +83,8 @@ def cdJapanScrape(html):
         res["inStock"] = False
     else:
         res["inStock"] = True
+
+    res["origin"] = "CDJapan"
     
     return {"success" : True, "res" : res}
 
@@ -101,6 +105,8 @@ def aitaikujiScrape(html):
     else:
         res["inStock"] = False
 
+    res["origin"] = "Aitaikuji"
+
     return {"success" : True, "res" : res}
 
 #Scraping info from Etsy (Doesn't work well with options + out of stock)
@@ -120,6 +126,8 @@ def etsyScrape(html):
     res["currency"] = infoJSON["offers"]["priceCurrency"]
     res["inStock"] =  (infoJSON["offers"]["availability"] == "https://schema.org/InStock")
 
+    res["origin"] = "Etsy"
+
     return {"success" : True, "res" : res}
 
 #Scraping info from omocat
@@ -137,6 +145,8 @@ def omocatScrape(html):
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
     res["currency"] = soup.find("meta", property="og:price:currency")["content"]
     res["inStock"] = infoJSON["available"]
+
+    res["origin"] = "Omocat"
 
     return {"success" : True, "res" : res}
 
@@ -160,6 +170,8 @@ def crunchyrollScrape(html):
     else:
         res["inStock"] = False
 
+    res["origin"] = "Crunchyroll"
+
     return {"success" : True, "res" : res}
 
 def melonbooksScrape(html):
@@ -177,6 +189,8 @@ def melonbooksScrape(html):
         res["inStock"] = False
     else:
         res["inStock"] = True
+
+    res["origin"] = "Melonbooks"
 
     return {"success" : True, "res" : res}
 
@@ -198,6 +212,8 @@ def goodsmileScrape(html):
     else:
         res["inStock"] = True
 
+    res["origin"] = "GoodSmile"
+
     return {"success" : True, "res" : res}
 
 def hobbygenkiScrape(html):
@@ -217,6 +233,8 @@ def hobbygenkiScrape(html):
     else:
         res["inStock"] = False
 
+    res["origin"] = "Hobby Genki"
+
     return {"success" : True, "res" : res}
 
 def solarisjapanScrape(html):
@@ -234,6 +252,8 @@ def solarisjapanScrape(html):
         res["inStock"] = False
     else:
         res["inStock"] = True
+
+    res["origin"] = "Solaris Japan"
 
     return {"success" : True, "res" : res}
 
@@ -255,6 +275,8 @@ def toranoanaScrape(html):
     else:
         res["inStock"] = True
 
+    res["origin"] = "Toranoana"
+
     return {"success" : True, "res" : res}
 
 def hljScrape(html):
@@ -275,6 +297,8 @@ def hljScrape(html):
     else:
         res["inStock"] = False
 
+    res["origin"] = "HobbyLink Japan"
+
     return {"success" : True, "res" : res}
 
 def dlsiteScrape(html):
@@ -291,6 +315,8 @@ def dlsiteScrape(html):
     res["price"] = float(info["data-price"])
     res["currency"] = "JPY"
     res["inStock"] = True                   #Digital item so always true
+
+    res["origin"] = "DLSite"
 
     return {"success" : True, "res" : res}
 
@@ -316,6 +342,8 @@ def boothScrape(html):
     else:
         res["inStock"] = True
 
+    res["origin"] = "Booth"
+
     return {"success" : True, "res" : res}
 
 def bookwalkerScrape(html):
@@ -332,6 +360,8 @@ def bookwalkerScrape(html):
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     res["inStock"] = True
+
+    res["origin"] = "BookWalker"
 
     return {"success" : True, "res" : res}
 
@@ -350,6 +380,8 @@ def usagundamScrape(html):
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["currency_code"]
     res["inStock"] = info["offers"][0]["in_stock"]
+
+    res["origin"] = "USA Gundam"
 
     return {"success" : True, "res" : res}
 
@@ -372,6 +404,8 @@ def surugayaScrape(html):
         res["inStock"] = True
     else:
         res["inStock"] = False
+
+    res["origin"] = "Surugaya"
 
     return {"success" : True, "res" : res}
 
