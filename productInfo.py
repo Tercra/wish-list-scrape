@@ -66,7 +66,7 @@ def otakuRepublicScrape(html):
     metaTags = SoupStrainer("meta")
     soup = BeautifulSoup(html, "html.parser", parse_only=metaTags)
     if(soup.find("meta", property="og:type")["content"] != "product"):
-        return {"success" : False, "msg" : "Not a otaku republic product page"}
+        return {"success" : False, "msg" : "Not a republic product page"}
 
     # Scraping info from the meta tags
     res = {}
@@ -572,16 +572,19 @@ def scrapeInfo(url):
     if(origin == "N/A" or origin not in ORIGINS.keys()):
         return {"success" : False, "msg" : "Not part of configured websites"}
 
-    if(origin in SCRAPEMETHODS.keys()):
-        reqResponse = SCRAPEMETHODS[origin](url)
-        info = ORIGINS[origin](reqResponse["req"])
-    else:
-        reqResponse = requestURL(url)
+    try:
+        if(origin in SCRAPEMETHODS.keys()):
+            reqResponse = SCRAPEMETHODS[origin](url)
+            info = ORIGINS[origin](reqResponse["req"])
+        else:
+            reqResponse = requestURL(url)
 
-        if(not reqResponse["success"]):
-            return {"success" : False, "msg" : "Request URL failed"}
+            if(not reqResponse["success"]):
+                return {"success" : False, "msg" : "Request URL failed"}
 
-        info = ORIGINS[origin](reqResponse["req"].text)
+            info = ORIGINS[origin](reqResponse["req"].text)
+    except Exception as e:
+        return {"success" : False, "msg" : "Something went wrong in the scrape function: " + e}
 
     if(info["success"]):
         return {"success" : True, "res" : info["res"]}
@@ -593,7 +596,7 @@ def scrapeInfo(url):
 if __name__ == "__main__":
     # pass
     # req = requestURL("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["req"]
-    # print(req)
+    # print(req.text)
     x = scrapeInfo("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")
     print(x)
     # print(x["res"])

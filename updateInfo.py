@@ -52,7 +52,7 @@ def otakuRepublicScrape(html):
     metaTags = SoupStrainer("meta")
     soup = BeautifulSoup(html, "html.parser", parse_only=metaTags)
     if(soup.find("meta", property="og:type")["content"] != "product"):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a republic product page"}
 
     # Scraping info from the meta tags
     res = {}
@@ -75,7 +75,7 @@ def cdJapanScrape(html):
     res["url"] = soup.find("meta", property="og:url")["content"]
     #Checking if the url is a product page
     if(res["url"].find("cdjapan.co.jp/product/") < 0):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a CDJapan product page"}
 
     res["price"] = float(soup.find("span", itemprop="price")["content"])
     res["currency"] = "JPY"
@@ -96,7 +96,7 @@ def aitaikujiScrape(html):
     temp = soup.find("meta", property="og:type")
     #Cheking if url is product page
     if(temp is None or temp["content"] != "og:product"):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a aitaikuji product page"}
 
     res["price"] = float(soup.find("meta", property="product:price:amount")["content"])
     res["currency"] = soup.find("meta", property="product:price:currency")["content"]
@@ -115,7 +115,7 @@ def etsyScrape(html):
     infoJSON = soup.find("script", type="application/ld+json")
 
     if(infoJSON is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not an etsy product page"}
         
     infoJSON = json.loads(infoJSON.get_text())
     res = {}
@@ -136,7 +136,7 @@ def omocatScrape(html):
 
     #check if product page
     if(soup.find("meta", property="og:type")["content"] != "product"):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a omocat product page"}
     
     res = {}
     infoJSON = soup.find("script", class_="product-json").get_text()
@@ -157,7 +157,7 @@ def crunchyrollScrape(html):
     #check if product page
     infoJSON = soup.find("div", class_="product-detail")
     if(infoJSON is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a crunchyroll product page"}
 
     infoJSON = infoJSON["data-segmentdata"]    
     infoJSON = json.loads(infoJSON)
@@ -181,7 +181,7 @@ def melonbooksScrape(html):
     res={}
     res["url"] = soup.find("link", rel="canonical")["href"]
     if(res["url"].find("melonbooks.co.jp/detail/") < 0):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a melonbook product page"}
 
     res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥"))
     res["currency"] = "JPY"
@@ -200,7 +200,7 @@ def goodsmileScrape(html):
     # Check if product page
     url = soup.find("meta", property="og:url")
     if(url is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a good smile product page"}
 
     # Info
     res = {}
@@ -222,7 +222,7 @@ def hobbygenkiScrape(html):
     # Check if product page
     url = soup.find("meta", property = "og:url")
     if(url is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a hobbygenki product page"}
 
     # Info
     res = {}
@@ -242,7 +242,7 @@ def solarisjapanScrape(html):
 
     # Check if product page
     if(soup.find("meta", property = "og:type")["content"] != "product"):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a solaris japan product page"}
 
     # Info
     res = {}
@@ -264,7 +264,7 @@ def toranoanaScrape(html):
     info = soup.find("script", type="application/ld+json", string = re.compile("Product"))
 
     if (info is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a toranora product page"}
     info = json.loads(info.get_text())
     # Info
     res = {}
@@ -285,7 +285,7 @@ def hljScrape(html):
     # Check if product page
     info = soup.find("script", type = "application/ld+json")
     if(info is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a hlj product page"}
 
     # Info
     info = json.loads(info.get_text())
@@ -307,7 +307,7 @@ def dlsiteScrape(html):
     # Check if Product page
     url = soup.find("meta", property="og:url")
     if(url is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a dlsite product page"}
 
     # Info
     info = soup.find("div", attrs={"data-price" : True})
@@ -326,7 +326,7 @@ def boothScrape(html):
     # Check Product
     info = soup.find("script", type="application/ld+json", string=re.compile("Product"))
     if (info is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a booth product page"}
 
     # Info
     info = json.loads(info.get_text())
@@ -352,7 +352,7 @@ def bookwalkerScrape(html):
     # Check if product page
     info = soup.find("script", type = "application/ld+json")
     if(info is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a bookwalker product page"}
 
     # Info
     info = json.loads(info.get_text())
@@ -370,7 +370,7 @@ def usagundamScrape(html):
 
     # Check if product page
     if(soup.find("meta", property="og:type")["content"] != "product"):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a usagundam product page"}
 
     # Info
     res = {}
@@ -391,7 +391,7 @@ def surugayaScrape(html):
     # Check if product page
     info = soup.find("script", type = "application/ld+json", string=re.compile("product"))
     if(info is None):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not a surugaya product page"}
 
     # Info
     info = info.get_text().strip()
@@ -442,16 +442,19 @@ def scrapeInfo(url):
     if(origin == "N/A" or origin not in ORIGINS.keys()):
         return {"success" : False}
 
-    if(origin in SCRAPEMETHODS.keys()):
-        reqResponse = SCRAPEMETHODS[origin](url)
-        info = ORIGINS[origin](reqResponse["req"])
-    else:
-        reqResponse = requestURL(url)
+    try:
+        if(origin in SCRAPEMETHODS.keys()):
+            reqResponse = SCRAPEMETHODS[origin](url)
+            info = ORIGINS[origin](reqResponse["req"])
+        else:
+            reqResponse = requestURL(url)
 
-        if(not reqResponse["success"]):
-            return {"success" : False}
+            if(not reqResponse["success"]):
+                return {"success" : False}
 
-        info = ORIGINS[origin](reqResponse["req"].text)
+            info = ORIGINS[origin](reqResponse["req"].text)
+    except Exception as e:
+        return {"success" : False, "msg" : "Something went wrong in the scrape function: " + e}
 
     if(info["success"]):
         return {"success" : True, "res" : info["res"], "origin" : origin}
