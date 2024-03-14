@@ -56,6 +56,7 @@ def otakuRepublicScrape(html):
 
     # Scraping info from the meta tags
     res = {}
+    res["url"] = soup.find("meta", property="og:url")["content"]
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
     res["currency"] = soup.find("meta", property="og:price:currency")["content"]
     if(soup.find("meta", property="og:availability")["content"] == "instock"):      #preorders are also listed as instock
@@ -98,6 +99,7 @@ def aitaikujiScrape(html):
     if(temp is None or temp["content"] != "og:product"):
         return {"success" : False, "msg" : "Not a aitaikuji product page"}
 
+    res["url"] = soup.find("meta", property="og:url")["content"]
     res["price"] = float(soup.find("meta", property="product:price:amount")["content"])
     res["currency"] = soup.find("meta", property="product:price:currency")["content"]
     if(soup.find("div", title="Availability")["class"][1] == "available"):
@@ -119,6 +121,7 @@ def etsyScrape(html):
         
     infoJSON = json.loads(infoJSON.get_text())
     res = {}
+    res["url"] = infoJSON["url"]
     if("highPrice" in infoJSON["offers"].keys()):
         res["price"] = float(infoJSON["offers"]["highPrice"])
     else:
@@ -142,6 +145,7 @@ def omocatScrape(html):
     infoJSON = soup.find("script", class_="product-json").get_text()
     infoJSON = json.loads(infoJSON)
     soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("meta"))
+    res["url"] = soup.find("meta", property="og:url")["content"]
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
     res["currency"] = soup.find("meta", property="og:price:currency")["content"]
     res["inStock"] = infoJSON["available"]
@@ -163,6 +167,7 @@ def crunchyrollScrape(html):
     infoJSON = json.loads(infoJSON)
 
     res= {}
+    res["url"] = infoJSON["url"]
     res["price"] = float(infoJSON["price"])
     res["currency"] = infoJSON["currency"]
     if(soup.find("div", class_="availability")["data-available"] == "true"):
@@ -204,6 +209,7 @@ def goodsmileScrape(html):
 
     # Info
     res = {}
+    res = {"url" : url["content"].replace("http://ap-com.gsls", "https://goodsmileshop.com")}
     res["price"] = float(soup.find("div", class_="big-price").get_text(strip=True).removeprefix("¥").replace(",", ""))
     res["currency"] = "JPY"
     stock = soup.find("div", class_="qty").span
@@ -225,7 +231,7 @@ def hobbygenkiScrape(html):
         return {"success" : False, "msg" : "Not a hobbygenki product page"}
 
     # Info
-    res = {}
+    res = {"url" : url["content"]}
     res["price"] = float(soup.find("meta", property = "product:price:amount")["content"])
     res["currency"] = soup.find("meta", property = "product:price:currency")["content"]
     if(soup.find("meta", property = "product:availability")["content"] == "in stock"):
@@ -246,6 +252,7 @@ def solarisjapanScrape(html):
 
     # Info
     res = {}
+    res["url"] = soup.find("meta", property = "og:url")["content"]
     res["price"] = float(soup.find("meta", property = "og:price:amount")["content"].replace(",", ""))
     res["currency"] = soup.find("meta", property = "og:price:currency")["content"]
     if(res["price"] == 0):
@@ -268,6 +275,7 @@ def toranoanaScrape(html):
     info = json.loads(info.get_text())
     # Info
     res = {}
+    res["url"] = info["offers"]["url"]
     res["price"] = float(info["offers"]["price"])
     res["currency"] = info["offers"]["priceCurrency"]
     if(info["offers"]["availability"] == "https://schema.org/SoldOut"):
@@ -290,6 +298,7 @@ def hljScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
+    res["url"] = info["offers"]["url"]
     res["price"] = float(info["offers"]["price"])
     res["currency"] = info["offers"]["priceCurrency"]
     if((info["offers"]["availability"] == "https://schema.org/InStock") or (info["offers"]["availability"] == "https://schema.org/PreOrder")):
@@ -312,6 +321,7 @@ def dlsiteScrape(html):
     # Info
     info = soup.find("div", attrs={"data-price" : True})
     res = {}
+    res["url"] = url["content"]
     res["price"] = float(info["data-price"])
     res["currency"] = "JPY"
     res["inStock"] = True                   #Digital item so always true
@@ -331,6 +341,7 @@ def boothScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
+    res["url"] = info["url"]
     if(info["offers"].get("price")):
         res["price"] = float(info["offers"]["price"])
     else:
@@ -357,6 +368,7 @@ def bookwalkerScrape(html):
     # Info
     info = json.loads(info.get_text())
     res = {}
+    res["url"] = info["url"]
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     res["inStock"] = True
@@ -374,8 +386,8 @@ def usagundamScrape(html):
 
     # Info
     res = {}
-    url = soup.find("meta", property="og:url")["content"]
-    info = requestURL(url + ".oembed")["req"].json()
+    res["url"] = soup.find("meta", property="og:url")["content"]
+    info = requestURL(res["url"] + ".oembed")["req"].json()
 
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["currency_code"]
@@ -397,6 +409,7 @@ def surugayaScrape(html):
     info = info.get_text().strip()
     info = json.loads(info[1:-1])
     res = {}
+    res["url"] = info["url"]
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     stock = soup.find("div", class_="out-of-stock-text")
