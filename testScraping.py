@@ -35,7 +35,7 @@ class TestScrapingMethods(unittest.TestCase):
 
         #Sister website page
         res = productInfo.otakuRepublicScrape(productInfo.requestURL("https://goodsrepublic.com/product/product_page_5642705.html?ref=cart&type=history_product")["req"].text)["res"]
-        self.assertEqual(res["name"], "Tapestry - NijiGaku / Osaka Shizuku & Takasaki Yu")
+        self.assertEqual(res["name"], "Osaka Shizuku & Takasaki Yu - Tapestry - NijiGaku")
         self.assertEqual(res["price"], 47.20)
         self.assertEqual(res["currency"], "USD")
         self.assertFalse(res["inStock"])
@@ -82,7 +82,7 @@ class TestScrapingMethods(unittest.TestCase):
     def test_estyScrape(self):
         #Working Product (multi price)
         res = productInfo.scrapeInfo("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["res"]
-        self.assertEqual(res["name"], "Hololive Vtuber Hoshimachi Suisei Enamel Pin, Fan Merch, Gift")
+        self.assertEqual(res["name"], "Hololive Vtuber Hoshimachi Suisei Enamel Pin, Fan Merch")
         self.assertEqual(res["price"], 17.0)
         self.assertEqual(res["currency"], "USD")
         self.assertTrue(res["inStock"])
@@ -120,10 +120,10 @@ class TestScrapingMethods(unittest.TestCase):
     def test_crunchyrollScrape(self):
         #Working product
         res = productInfo.scrapeInfo("https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")["res"]
-        self.assertEqual(res["name"], "Hololive Production - Nekomata Okayu Pop Up Parade")
-        self.assertEqual(res["price"], 29.99)
+        self.assertEqual(res["name"], "Nekomata Okayu Hololive Production Pop Up Parade Figure")
+        self.assertEqual(res["price"], 33.14)
         self.assertEqual(res["currency"], "USD")
-        self.assertEqual(res["url"], "https://store.crunchyroll.com/products/hololive-production-nekomata-okayu-pop-up-parade-4580416943994.html")
+        self.assertEqual(res["url"], "https://store.crunchyroll.com/products/nekomata-okayu-hololive-production-pop-up-parade-figure-4580416943994.html")
         self.assertTrue(res["inStock"])
         #Working image
 
@@ -160,8 +160,8 @@ class TestScrapingMethods(unittest.TestCase):
     def test_goodsmileScrape(self):
         #working product
         res = productInfo.scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Goods/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch-Lamperouge/p/GSC_WD_05284")["res"]
-        self.assertEqual(res["url"], "https://goodsmileshop.com/en/CATEGORY-ROOT/Goods/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch-Lamperouge/p/GSC_WD_05284")
-        self.assertEqual(res["name"], "Code Geass: Lelouch of the Rebellion Plushie Lelouch Lamperouge")
+        self.assertEqual(res["url"], "https://goodsmileshop.com/en/On-Sale-Now/Available-Now/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch/p/GSC_WD_05284")
+        self.assertEqual(res["name"], "Code Geass: Lelouch of the Rebellion Plushie Lelouch")
         self.assertEqual(res["price"], 3080.0)
         self.assertEqual(res["currency"], "JPY")
         self.assertTrue(res["inStock"])
@@ -196,8 +196,8 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company#")["res"]
         self.assertEqual(res["url"], "https://solarisjapan.com/products/kantai-collection-kan-colle-shigure-1-7-casual-ver-good-smile-company")
         self.assertEqual(res["name"], "Kantai Collection ~Kan Colle~ - Shigure - 1/7 - Casual Ver. (Good Smile Company)")
-        self.assertEqual(res["price"], 11309.0)
-        self.assertEqual(res["currency"], "JPY")
+        self.assertEqual(res["price"], 83.44)
+        self.assertEqual(res["currency"], "USD")
         self.assertTrue(res["inStock"])
 
         # Sold out product
@@ -227,10 +227,10 @@ class TestScrapingMethods(unittest.TestCase):
 
     def test_hljScrape(self):
         # Working product page
-        res = productInfo.scrapeInfo("https://www.hlj.com/1-7-scale-fate-grand-order-lancer-caenis-figure-gsc94453")["res"]
-        self.assertEqual(res["url"], "https://www.hlj.com/product/GSC94453/")
-        self.assertEqual(res["name"], "1/7 Fate/Grand Order Lancer/Caenis Figure")
-        self.assertEqual(res["price"], 22902.0)
+        res = productInfo.scrapeInfo("https://www.hlj.com/master-detective-archives-rain-code-plushie-shinigami-gsc19032")["res"]
+        self.assertEqual(res["url"], "https://www.hlj.com/product/GSC19032/")
+        self.assertEqual(res["name"], "Master Detective Archives: RAIN CODE Plushie Shinigami")
+        self.assertEqual(res["price"], 4275.0)
         self.assertEqual(res["currency"], "JPY")
         self.assertTrue(res["inStock"])
 
@@ -260,7 +260,7 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://booth.pm/en/items/1482245")["res"]
         self.assertEqual(res["url"], "https://booth.pm/ja/items/1482245")
         self.assertEqual(res["name"], "舞風-Maikaze Original Vocal Songs Archives 2006～2018")
-        self.assertEqual(res["price"], 2200.0)
+        self.assertEqual(res["price"], 2480.0)
         self.assertEqual(res["currency"], "JPY")
         self.assertTrue(res["inStock"])
 
@@ -298,7 +298,7 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru?variant=41171106758853")["res"]
         self.assertEqual(res["url"], "https://www.usagundamstore.com/products/fate-grand-carnival-pop-up-parade-ritsuka-fujimaru")
         self.assertEqual(res["name"], "Fate/Grand Carnival Pop Up Parade Ritsuka Fujimaru")
-        self.assertEqual(res["price"], 38.99)
+        self.assertEqual(res["price"], 29.99)
         self.assertEqual(res["currency"], "USD")
         self.assertTrue(res["inStock"])
 
@@ -312,10 +312,10 @@ class TestScrapingMethods(unittest.TestCase):
 
     def test_surugayaScrape(self):
         # Working product page
-        res = productInfo.scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")["res"]
-        self.assertEqual(res["url"], "https://www.suruga-ya.jp/product/detail/ZHOA71527")
-        self.assertEqual(res["name"], "&lt;&lt;ラブライブ！&gt;&gt; わたしのムスコは欲しがりで。 / ぼっち飯")
-        self.assertEqual(res["price"], 400.0)
+        res = productInfo.scrapeInfo("https://www.suruga-ya.jp/product/detail/602241993")["res"]
+        self.assertEqual(res["url"], "https://www.suruga-ya.jp/product/detail/602241993")
+        self.assertEqual(res["name"], "駿河屋 -<新品/中古>ランサー/謎のアルターエゴ・Λ 「Fate/Grand Order」 1/7 PVC＆ABS製塗装済み完成品（フィギュア）")
+        self.assertEqual(res["price"], 24500.0)
         self.assertEqual(res["currency"], "JPY")
         self.assertTrue(res["inStock"])
 

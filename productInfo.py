@@ -37,12 +37,14 @@ def requestAitaikuji(url):
         driver.quit()
 
 IMAGE_DIR = "./images"
+rep = re.compile(r"[/\\]")
+delete = re.compile(r"[#%&{}<>*?/$!'\":@+`|= ]")
 
 def saveImage(name, url):
     img = requestURL(url)["req"].content
     # Sanitize the name as it might contain characters that cause problems
-    temp = re.sub(r"[/\\]", "-", name)
-    temp = re.sub(r"[#%&{}<>*?/$!'\":@+`|=]", "", temp)
+    temp = rep.sub("-", name)
+    temp = delete.sub("", temp)
     path = os.path.join(IMAGE_DIR, (temp + ".png"))
 
     # Check if folder exists or not
@@ -482,7 +484,10 @@ def bookwalkerScrape(html):
     res["price"] = float(info["offers"][0]["price"])
     res["currency"] = info["offers"][0]["priceCurrency"]
     res["inStock"] = True
-    res["image"] = info["image"]
+    # res["image"] = info["image"]
+    soup = BeautifulSoup(html, "html.parser", parse_only=SoupStrainer("img"))
+    imgURL = soup.find("img", itemprop="image")["src"]
+    res["img"] = saveImage(res["name"], imgURL)
 
     res["origin"] = "BookWalker"
 
@@ -603,7 +608,7 @@ if __name__ == "__main__":
     # pass
     # req = requestURL("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["req"]
     # print(req.text)
-    x = scrapeInfo("https://www.suruga-ya.jp/product/detail/ZHOA71527")
+    x = scrapeInfo("https://otakurepublic.com/product/product_page_2421660.html?ref=drawer&type=product_matrix")
     print(x)
     # print(x["res"])
     # with open("./test.txt", "w") as f:
