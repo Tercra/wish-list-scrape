@@ -157,7 +157,7 @@ class TestScrapingMethods(unittest.TestCase):
         res = productInfo.scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=1721")
         self.assertFalse(res["success"])
 
-    def test_goodsmileScrape(self):
+    def test_goodsmileshopScrape(self):
         #working product
         res = productInfo.scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Goods/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch-Lamperouge/p/GSC_WD_05284")["res"]
         self.assertEqual(res["url"], "https://goodsmileshop.com/en/On-Sale-Now/Available-Now/Code-Geass--Lelouch-of-the-Rebellion-Plushie-Lelouch/p/GSC_WD_05284")
@@ -172,6 +172,23 @@ class TestScrapingMethods(unittest.TestCase):
 
         #Not product page
         res = productInfo.scrapeInfo("https://goodsmileshop.com/en/CATEGORY-ROOT/Nendoroid/c/133?site=goodsmile-global&lang=en&sessionId=56480E1287294A228B4068B4DA141602.node43")
+        self.assertFalse(res["success"])
+
+    def test_goodsmileScrape(self):
+        #working product
+        res = productInfo.scrapeInfo("https://www.goodsmile.com/en/product/10091/POP+UP+PARADE+Sakura+Miko")["res"]
+        self.assertEqual(res["url"], "https://www.goodsmile.com/en/product/10091/POP+UP+PARADE+Sakura+Miko")
+        self.assertEqual(res["name"], "Rerelease [POP UP PARADE Sakura Miko]")
+        self.assertEqual(res["price"], 5500.0)
+        self.assertEqual(res["currency"], "JPY")
+        self.assertTrue(res["inStock"])
+
+        #sold out product
+        res = productInfo.scrapeInfo("https://www.goodsmile.com/en/product/46635/Arcueid+Brunestud+~Dresscode+Clad+in+Glaciers~")["res"]
+        self.assertFalse(res["inStock"])
+
+        #Not product page
+        res = productInfo.scrapeInfo("https://www.goodsmile.com/en/search?search_category=1")
         self.assertFalse(res["success"])
 
     def test_hobbygenkiScrape(self):
