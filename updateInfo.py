@@ -453,7 +453,7 @@ def scrapeInfo(url):
     #Check if url is valid and if origin is part of configured sites
     origin = extractOrigin(url)
     if(origin == "N/A" or origin not in ORIGINS.keys()):
-        return {"success" : False}
+        return {"success" : False, "msg" : "Not part of configured websites"}
 
     try:
         if(origin in SCRAPEMETHODS.keys()):
@@ -472,7 +472,7 @@ def scrapeInfo(url):
     if(info["success"]):
         return {"success" : True, "res" : info["res"], "origin" : origin}
     
-    return {"success" : False}
+    return {"success" : False, "msg" : info["msg"]}
     
 
 
