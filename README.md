@@ -8,6 +8,10 @@ A web application that allows users to add items/products using a url of a shopp
 * testScraping.py
     * Unittest to test methods in productinfo.py
     * Test will not work in time, because certain info like price and availibility will change in time
+    * Command Line for testing
+    * ```
+      python -m unittest testScraping.TestScrapingMethods.testMethodName   
+      ```
 
 #
 
