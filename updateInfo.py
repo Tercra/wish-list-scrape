@@ -429,8 +429,9 @@ def surugayaScrape(html):
         return {"success" : False, "msg" : "Not a surugaya product page"}
 
     # Info
-    info = info.get_text().strip()
-    info = json.loads(info[1:-1])
+    info = info.get_text()
+    info = json.loads(info)
+    info = info[0]
     res = {}
     res["url"] = info["url"]
     res["price"] = float(info["offers"][0]["price"])

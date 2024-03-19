@@ -557,8 +557,9 @@ def surugayaScrape(html):
         return {"success" : False, "msg" : "Not a surugaya product page"}
 
     # Info
-    info = info.get_text().strip()
-    info = json.loads(info[1:-1])
+    info = info.get_text()
+    info = json.loads(info)
+    info = info[0]
     res = {}
     res["url"] = info["url"]
     res["name"] = info["name"]
@@ -638,7 +639,7 @@ if __name__ == "__main__":
     # pass
     # req = requestURL("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["req"]
     # print(req.text)
-    x = scrapeInfo("https://otakurepublic.com/product/product_page_2421660.html?ref=drawer&type=product_matrix")
+    x = scrapeInfo("https://www.suruga-ya.jp/product/detail/646156204")
     print(x)
     # print(x["res"])
     # with open("./test.txt", "w") as f:
