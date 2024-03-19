@@ -78,7 +78,11 @@ def otakuRepublicScrape(html):
 
     # Scraping info from the meta tags
     res = {}
-    nameTemp = soup.find("meta", attrs={"name":"og:description"})["content"].split(",")
+    nameTemp = soup.find("meta", attrs={"name":"og:description"})
+    if(nameTemp is None):
+        nameTemp = soup.find("meta", property="og:description")
+    nameTemp = nameTemp["content"].split(",")
+
     if(nameTemp[3].find("price") == -1):
         nameTemp = (" ").join(nameTemp[3:])
     else:
@@ -258,7 +262,7 @@ def melonbooksScrape(html):
         return {"success" : False, "msg" : "Not a melonbook product page"}
 
     res["name"] = soup.find("h1", class_="page-header").get_text()
-    res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥"))
+    res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥").replace(",", ""))
     res["currency"] = "JPY"
     if(soup.find("span", class_="state-instock").get_text() == "-"):
         res["inStock"] = False
@@ -594,6 +598,7 @@ ORIGINS = {
     "otakurepublic" : otakuRepublicScrape,
     "goodsrepublic" : otakuRepublicScrape,
     "japanese-snacks-republic" : otakuRepublicScrape,
+    "figurerepublic" : otakuRepublicScrape,
     "cdjapan" : cdJapanScrape,
     "aitaikuji" : aitaikujiScrape,
     "etsy" : etsyScrape,
@@ -645,7 +650,7 @@ if __name__ == "__main__":
     # pass
     # req = requestURL("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["req"]
     # print(req.text)
-    x = scrapeInfo("https://goodsrepublic.com/product/product_page_6284635.html")
+    x = scrapeInfo("https://www.melonbooks.co.jp/detail/detail.php?product_id=792640")
     print(x)
     # print(x["res"])
     # with open("./test.txt", "w") as f:

@@ -188,7 +188,7 @@ def melonbooksScrape(html):
     if(res["url"].find("melonbooks.co.jp/detail/") < 0):
         return {"success" : False, "msg" : "Not a melonbook product page"}
 
-    res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥"))
+    res["price"] = float(soup.find("span", class_="yen").get_text().strip().removeprefix("¥").replace(",", ""))
     res["currency"] = "JPY"
     if(soup.find("span", class_="state-instock").get_text() == "-"):
         res["inStock"] = False
@@ -454,6 +454,7 @@ ORIGINS = {
     "otakurepublic" : otakuRepublicScrape,
     "goodsrepublic" : otakuRepublicScrape,
     "japanese-snacks-republic" : otakuRepublicScrape,
+    "figurerepublic" : otakuRepublicScrape,
     "cdjapan" : cdJapanScrape,
     "aitaikuji" : aitaikujiScrape,
     "etsy" : etsyScrape,
