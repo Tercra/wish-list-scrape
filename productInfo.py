@@ -78,8 +78,14 @@ def otakuRepublicScrape(html):
 
     # Scraping info from the meta tags
     res = {}
+    nameTemp = soup.find("meta", attrs={"name":"og:description"})["content"].split(",")
+    if(nameTemp[3].find("price") == -1):
+        nameTemp = (" ").join(nameTemp[3:])
+    else:
+        nameTemp = (" ").join(nameTemp[4:])
+
     res["url"] = soup.find("meta", property="og:url")["content"]
-    res["name"] = soup.find("meta", property="og:title")["content"]
+    res["name"] = nameTemp
     res["price"] = float(soup.find("meta", property="og:price:amount")["content"])
     res["currency"] = soup.find("meta", property="og:price:currency")["content"]
     if(soup.find("meta", property="og:availability")["content"] == "instock"):      #preorders are also listed as instock
@@ -639,7 +645,7 @@ if __name__ == "__main__":
     # pass
     # req = requestURL("https://www.etsy.com/listing/1230404476/hololive-vtuber-hoshimachi-suisei-enamel?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=suisei&ref=sr_gallery-1-1&sts=1&organic_search_click=1&variation0=2648039902")["req"]
     # print(req.text)
-    x = scrapeInfo("https://www.suruga-ya.jp/product/detail/646156204")
+    x = scrapeInfo("https://goodsrepublic.com/product/product_page_6284635.html")
     print(x)
     # print(x["res"])
     # with open("./test.txt", "w") as f:
