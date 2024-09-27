@@ -35,7 +35,7 @@ class TestScrapingMethods(unittest.TestCase):
 
         #Sister website page
         res = productInfo.otakuRepublicScrape(productInfo.requestURL("https://goodsrepublic.com/product/product_page_5642705.html?ref=cart&type=history_product")["req"].text)["res"]
-        self.assertEqual(res["name"], "Osaka Shizuku & Takasaki Yu - Tapestry - NijiGaku")
+        self.assertEqual(res["name"], " 高咲侑＆桜坂しずく B2タペストリー 「ラブライブ!虹ヶ咲学園スクールアイドル同好会」  Love Live! Nijigasaki Gakuen School Idol Doukoukai Love Live Series  Tapestry  Osaka Shizuku & Takasaki Yu")
         self.assertEqual(res["price"], 47.20)
         self.assertEqual(res["currency"], "USD")
         self.assertFalse(res["inStock"])
@@ -64,7 +64,7 @@ class TestScrapingMethods(unittest.TestCase):
         
     def test_aitaikujiScrape(self):
         #Working product page
-        res = productInfo.aitaikujiScrape(productInfo.requestAitaikuji("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["req"])["res"]
+        res = productInfo.scrapeInfo("https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-dress-shirt-black")["res"]
         self.assertEqual(res["name"], "Genshin Impact Hoyoverse Official Goods Diluc Dress Shirt Black")
         self.assertEqual(res["price"], 9500.0)
         self.assertEqual(res["currency"], "JPY")
@@ -72,11 +72,11 @@ class TestScrapingMethods(unittest.TestCase):
         self.assertEqual(res["url"], "https://www.aitaikuji.com/series/genshin-impact/genshin-impact-hoyoverse-official-goods-diluc-knit-sweater-1")
 
         #Sold out product
-        res = productInfo.aitaikujiScrape(productInfo.requestAitaikuji("https://www.aitaikuji.com/genshin-impact-apex-1-7-scale-figurine-ganyu-plenilune-gaze-ver")["req"])["res"]
+        res = productInfo.scrapeInfo("https://www.aitaikuji.com/genshin-impact-apex-1-7-scale-figurine-ganyu-plenilune-gaze-ver")["res"]
         self.assertFalse(res["inStock"])
 
         #Not a product Page
-        res = productInfo.aitaikujiScrape(productInfo.requestAitaikuji("https://www.aitaikuji.com/series/kirby")["req"])
+        res = productInfo.scrapeInfo("https://www.aitaikuji.com/series/kirby")
         self.assertFalse(res["success"])
 
     def test_estyScrape(self):
